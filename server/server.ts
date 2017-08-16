@@ -1,9 +1,10 @@
 import * as fs from 'fs'
-import {Tag} from './Helpers/Tag';
-
+import {DocumentParser} from "./Parsers/DocumentParser"
 
 const html : string = fs.readFileSync('../public/index.html', 'utf-8');
 
+let parser = new DocumentParser(html);
 
+const items = parser.findItems();
 
-Tag.findTag(html, 'tbody');
+let b = 23;
