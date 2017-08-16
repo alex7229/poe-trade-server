@@ -16,7 +16,9 @@ class ItemParser {
     private tbodyTag : string;
     private innerHtml : string;
     private id: number;
-    private price : Price;
+    private price : Price = {
+        exist: false
+    };
     private generalAttributesNames: string[] = [
         'data-seller',
         'data-sellerid',
@@ -27,7 +29,7 @@ class ItemParser {
         'data-y'
     ];
     private generalAttributesData: Attribute[] = [];
-    private Requirements: Requirement[] = [];
+    private requirements: Requirement[] = [];
 
 
     constructor (tbodyTag : string, innerHtml : string) {
@@ -40,11 +42,13 @@ class ItemParser {
         this.setGeneralAttributes();
         this.setId();
         this.setPrice();
+        this.requirements = this.parseRequirementsRow();
+        debugger;
     }
 
     private setGeneralAttributes () {
         this.generalAttributesData = this.generalAttributesNames.map(name => {
-            const attr = Tag.findAttr(this.innerHtml, name, 'tbody');
+            const attr = Tag.findAttr(this.tbodyTag, name, 'tbody');
             return {
                 name,
                 value : attr.attrFound && attr.attrValue ? attr.attrValue : ''
@@ -67,14 +71,11 @@ class ItemParser {
     }
 
     private setPrice() {
-        const rawPrice : AttrFinder = Tag.findAttr(this.tbodyTag, 'buyout', 'tbody');
-        if (!rawPrice.attrValue) {
-            this.price.exist = false;
-            return;
-        }
-        const regExp : RegExp = /(\d)+ (\w)+/;
+        const rawPrice : AttrFinder = Tag.findAttr(this.tbodyTag, 'data-buyout', 'tbody');
+        if (!rawPrice.attrValue) return;
+        const regExp : RegExp = /([\d]*) ([\w]*)/;
         const match = rawPrice.attrValue.match(regExp);
-        if (!match || match.length < 3) {
+        if (!match || !match[1] || !match[2]) {
             throw new Error(`wrong item buyout: ${rawPrice}`);
         }
         this.price.exist = true;
@@ -84,7 +85,7 @@ class ItemParser {
 
     private parseRequirementsRow () : Requirement[] {
         const tag : TagData[] = Tag.findTag(this.innerHtml, 'ul', [{name: 'class', value: 'requirements proplist'}]);
-        if (tag.length !== 0) {
+        if (tag.length !== 1) {
             console.log(tag);
             throw new Error('Multiple props rows for item are not permitted');
         }
@@ -93,21 +94,15 @@ class ItemParser {
             .map((tagData) => {
                 return tagData.innerHtml;
             })
-            .filter((html) => {
-                return propertiesNames.some((propertyName) => {
-                    const regExp : RegExp = new RegExp(`${propertyName}[\s\S]*[\d]`);
-                    return html.match(propertyName) !== null;
-                })
-            })
             .map(html => {
-                let name : string = 'default. Should be overwritten anyways';
+                let name : string = 'default';
                 let value : number = 0;
                 for (let propertyName of propertiesNames) {
-                    const regExp : RegExp = new RegExp(`${propertyName}[^\d]*([\d]{1,3})`, 'ig');
+                    const regExp : RegExp = new RegExp(`${propertyName}[^\\d]*([\\d]{1,3})`);
                     const match = html.match(regExp);
-                    if (match && match.length === 3) {
-                        name = match[1];
-                        value = parseInt(match[2]);
+                    if (match && match[1]) {
+                        name = propertyName;
+                        value = parseInt(match[1]);
                         break;
                     }
                 }
@@ -116,6 +111,11 @@ class ItemParser {
                     value
                 }
             })
+            .filter(({name, value}) => {
+                return name !== 'default'
+            })
     }
 
 }
+
+export {ItemParser}

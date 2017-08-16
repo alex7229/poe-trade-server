@@ -96,7 +96,7 @@ class Tag {
                 break;
             }
         }
-        if (!firstClosingTag) {
+        if (firstClosingTag === undefined) {
             //every opening tag starts earlier than first closing tag starts ->
             // the first closing tag refers to last opening
             firstClosingTag = openingTagsPositions.length-1

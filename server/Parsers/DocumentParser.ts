@@ -1,4 +1,4 @@
-import {Tag} from "../Helpers/Tag"
+import {Tag, TagData} from "../Helpers/Tag"
 
 class DocumentParser {
 
@@ -9,7 +9,7 @@ class DocumentParser {
         this.html = html;
     }
 
-    public findItems () {
+    public findItems () : TagData[] {
         return Tag.findTag(this.html, 'tbody', [{name: 'data-seller'}, {name: 'data-sellerid'}])
     }
 
