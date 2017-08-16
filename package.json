@@ -5,7 +5,9 @@
     "request": "^2.81.0"
   },
   "dependencies": {
+    "@types/node": "^8.0.22",
     "body-parser": "^1.17.2",
-    "express": "^4.15.4"
+    "express": "^4.15.4",
+    "html-minifier": "^3.5.3"
   }
 }
