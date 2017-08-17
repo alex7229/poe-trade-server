@@ -11,5 +11,3 @@ const items : TagData[] = parser.findItems();
 
 const itemParser = new ItemParser(items[0].tagBody, items[0].innerHtml);
 
-
-let b = 23;

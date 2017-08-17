@@ -42,13 +42,13 @@ class Tag {
         return result;
     }
 
-    static findTag (html: string, tag : string, tagAttributes : Attribute[] = []) : TagData[] {
+    static findTag (html: string, tag : string, tagAttributes : Attribute[] = [], unique? : boolean) : TagData[] {
         html = Tag.minifyHtml(html);
         const openingTagsPositions : TagPosition[] = Tag.findTagsPositions(html, tag, true);
         const closingTagsPositions : TagPosition[] = Tag.findTagsPositions(html, tag, false);
         let tagsPositions = Tag.sortNestedTags(openingTagsPositions, closingTagsPositions);
         let tagsData = Tag.findTagsHtml(tagsPositions, html);
-        return tagsData.filter(currentTag => {
+        const tagsDataFiltered =  tagsData.filter(currentTag => {
             return tagAttributes.every(attrData => {
                 const foundedAttr : AttrFinder = Tag.findAttr(currentTag.tagBody, attrData.name, tag);
                 if (!foundedAttr.attrFound) {
@@ -59,7 +59,11 @@ class Tag {
                 }
                 return true;
             })
-        })
+        });
+        if (unique && tagsDataFiltered.length !== 1) {
+            throw new Error(`total tags count is ${tagsData.length} -> more than 1. This  tag should be unique`)
+        }
+        return tagsDataFiltered;
     }
 
     private static minifyHtml(html : string) {
@@ -68,7 +72,8 @@ class Tag {
             collapseWhiteSpace: true,
             quoteCharacter: `"`,
             removeComments: true,
-        });
+        })
+            .replace(/<br>/ig, '');
     }
 
     private static sortNestedTags (openingTagsPositions : TagPosition[], closingTagsPosition : TagPosition[]) : WholeTagPosition[] {
