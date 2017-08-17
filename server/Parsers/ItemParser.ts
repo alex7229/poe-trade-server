@@ -19,6 +19,11 @@ interface Requirement {
     value : number,
 }
 
+interface Affix {
+    name : string,
+    value : string
+}
+
 class ItemParser {
 
     private tbodyTag : string;
@@ -63,7 +68,7 @@ class ItemParser {
         ['block', 'block'],
         ['crit', 'critical chance'],
         ['level', 'level']
-]
+    ]
         .map((data) => {
             return {
                 'data-name': data[0],
@@ -71,6 +76,8 @@ class ItemParser {
                 exist: false
             }
         });
+
+    private affixes : Affix [] = [];
 
 
     constructor (tbodyTag : string, innerHtml : string) {
@@ -91,6 +98,7 @@ class ItemParser {
         this.setTime();
         this.parseRequirementsRow();
         this.parseParameters();
+        this.parseAffixes();
     }
 
     private setImageUrl() {
@@ -206,6 +214,40 @@ class ItemParser {
             }
             return stat;
         })
+    }
+
+    parseAffixes() {
+        const affixesList : TagData[] = Tag.findTag(
+            this.innerHtml,
+            'ul',
+            [{name: 'class', value: 'item-mods'}],
+            true
+        );
+        const affixesListHtml = affixesList[0].innerHtml;
+        let tagData : TagData[] = [];
+        try {
+            tagData = Tag.findTag(
+                affixesListHtml,
+                'li',
+                [{'name': 'data-name'}],
+                false
+            )
+        } catch (err) {
+            //item with no affixes
+            return;
+        }
+        this.affixes =  tagData
+            .map(tagData => {
+                const nameData = Tag.findAttr(tagData.tagBody, 'data-name', 'li');
+                const valueData = Tag.findAttr(tagData.tagBody, 'data-value', 'li');
+                if (!nameData.attrValue || !valueData.attrValue) {
+                    throw new Error(`no data-name or data-value attr in mods list <li> element: ${tagData.tagBody}`)
+                }
+                return {
+                    name: nameData.attrValue,
+                    value: valueData.attrValue
+                }
+            });
     }
 
 }

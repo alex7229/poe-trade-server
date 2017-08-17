@@ -38,7 +38,7 @@ class Time {
         3) 2...n hours ago
         6) Yesterday
         7) 2...n days ago
-        8) a week ago
+        8) one week ago
         9) 2..n weeks ago
         10) 1 month ago
         )11 2...n months ago*/
@@ -49,10 +49,12 @@ class Time {
         if (match !== null && match[1] && match[2]) {
             if (match[1] === 'a' || match[1] === 'an') {
                 duration = 1;
-                units = match[2] + 's';
             } else {
                 duration = parseInt(match[1]);
-                units = match[2]
+            }
+            units = match[2];
+            if (units[units.length-1] !== 's') {
+                units += 's'
             }
         } else if (this.rawTime !== 'Yesterday') {
             this.logError();
