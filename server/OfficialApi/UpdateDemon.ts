@@ -21,7 +21,8 @@ class UpdateDemon {
         const itemsManager = new ItemsManager(this.currentId);
         let apiResponse = await itemsManager.getData();
         if (!apiResponse.success) {
-            this.retryUpdate(this.officialApiDelay)
+            this.retryUpdate(this.officialApiDelay);
+            return;
         }
         if (apiResponse.data) {
             console.log(apiResponse.data)
