@@ -26,8 +26,11 @@ interface TagData extends WholeTagPosition {
 }
 
 class Tag {
-    static findAttr (html : string, attr : string, tag : string) : AttrFinder {
-        html = Tag.minifyHtml(html);
+    static findAttr (html : string,   attr : string, tag : string,) : AttrFinder {
+        //find all calls to this method and refactor correspondingly
+        //make similar to findTag method
+        //refactor in future
+        html = Tag.removeBreakLines(html);
         const regExp : RegExp = new RegExp(`<${tag}[^>]* ${attr}="([^"]*)"[^>]*>`, 'i');
         const match : null | string[] = html.match(regExp);
         let result : AttrFinder = {
@@ -41,7 +44,7 @@ class Tag {
     }
 
     static findTag (html: string, tag : string, tagAttributes : Attribute[] = [], unique? : boolean) : TagData[] {
-        html = Tag.minifyHtml(html);
+        html = Tag.removeBreakLines(html);
         const openingTagsPositions : TagPosition[] = Tag.findTagsPositions(html, tag, true);
         const closingTagsPositions : TagPosition[] = Tag.findTagsPositions(html, tag, false);
         let tagsPositions = Tag.sortNestedTags(openingTagsPositions, closingTagsPositions);
@@ -64,7 +67,7 @@ class Tag {
         return tagsDataFiltered;
     }
 
-    private static minifyHtml(html : string) {
+    private static removeBreakLines(html : string) {
         return html.replace(/<br>/ig, '');
     }
 
