@@ -41,9 +41,7 @@ class Tag {
     }
 
     static findTag (html: string, tag : string, tagAttributes : Attribute[] = [], unique? : boolean) : TagData[] {
-        // console.time('start');
         html = Tag.minifyHtml(html);
-        // console.timeEnd('start');
         const openingTagsPositions : TagPosition[] = Tag.findTagsPositions(html, tag, true);
         const closingTagsPositions : TagPosition[] = Tag.findTagsPositions(html, tag, false);
         let tagsPositions = Tag.sortNestedTags(openingTagsPositions, closingTagsPositions);
@@ -67,14 +65,6 @@ class Tag {
     }
 
     private static minifyHtml(html : string) {
-        /*return html_minifier.minify(html, {
-            collapseInlineTagWhitespace: true,
-            collapseWhiteSpace: true,
-            quoteCharacter: `"`,
-            removeComments: true,
-        })
-            .replace(/<br>/ig, '');*/
-        //html_minifier is incredibly slow
         return html.replace(/<br>/ig, '');
     }
 

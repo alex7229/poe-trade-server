@@ -6,9 +6,11 @@
   },
   "dependencies": {
     "@types/node": "^8.0.22",
+    "assert": "^1.4.1",
     "body-parser": "^1.17.2",
     "express": "^4.15.4",
     "html-minifier": "^3.5.3",
-    "moment": "^2.18.1"
+    "moment": "^2.18.1",
+    "mongodb": "^2.2.31"
   }
 }

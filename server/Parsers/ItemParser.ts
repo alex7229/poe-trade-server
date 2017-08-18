@@ -1,5 +1,17 @@
 import {Tag, AttrFinder, TagData, Attribute} from '../Helpers/Tag';
 import {Time} from "../Helpers/Time"
+import {Moment} from "moment";
+
+interface Item {
+    id: number,
+    time: Moment,
+    price: Price,
+    imageUrl: string,
+    generalData : Attribute[],
+    requirements: Requirement[],
+    itemStats: ItemStats[],
+    affixes: Affix[]
+}
 
 interface Price {
     value?: number,
@@ -7,7 +19,7 @@ interface Price {
     exist : boolean
 }
 
-interface TableStats {
+interface ItemStats {
     'data-name' : string,
     description : string,
     exist : boolean,
@@ -33,6 +45,7 @@ class ItemParser {
         exist: false
     };
     private imageUrl : string;
+    private time : Moment;
 
     private generalAttributesNames: string[] = [
         'data-seller',
@@ -54,7 +67,7 @@ class ItemParser {
     ];
     private requirements: Requirement[] = [];
 
-    private tableStats : TableStats[] = [
+    private itemStats : ItemStats[] = [
         ['q', 'quality'],
         ['quality_pd', 'physical damage'],
         ['ed', 'elemental damage'],
@@ -86,8 +99,17 @@ class ItemParser {
         this.parse();
     }
 
-    public getAllData() {
-
+    public getAllData() : Item {
+        return {
+            id: this.id,
+            time: this.time,
+            price: this.price,
+            imageUrl: this.imageUrl,
+            generalData: this.generalAttributesData,
+            requirements: this.requirements,
+            itemStats: this.itemStats,
+            affixes: this.affixes
+        }
     }
 
     private parse() {
@@ -119,7 +141,7 @@ class ItemParser {
         );
         const rawTime: string = timeTags[0].innerHtml;
         const timeHelper = new Time(rawTime);
-        const time = timeHelper.getStringTime();
+        this.time = timeHelper.getMomentTime();
     }
 
     private setGeneralAttributes () {
@@ -187,7 +209,7 @@ class ItemParser {
                     value
                 }
             })
-            .filter(({name, value}) => {
+            .filter(({name}) => {
                 return name !== 'default'
             })
     }
@@ -200,7 +222,7 @@ class ItemParser {
             true
         );
         const tableHtml = tableData[0].innerHtml;
-        this.tableStats.map((stat) => {
+        this.itemStats.map((stat) => {
             const tagData : TagData[] = Tag.findTag(
                 tableHtml,
                 'td',
@@ -252,4 +274,4 @@ class ItemParser {
 
 }
 
-export {ItemParser}
+export {ItemParser, Item}
