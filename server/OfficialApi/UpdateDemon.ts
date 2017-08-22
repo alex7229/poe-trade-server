@@ -146,5 +146,6 @@ export {UpdateDemon}
 let data = [{
     time: moment().format('DD.MM.YY HH:mm:ss'),
     changeId: 'someid',
-    exist: true
+    exist: true,
+    validated: false
 }];
