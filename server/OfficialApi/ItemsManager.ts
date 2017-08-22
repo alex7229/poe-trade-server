@@ -1,10 +1,9 @@
 import {IdManager} from "./IdManager"
 import {Request} from "../Helpers/Request"
-import {JsonValidator} from "../Helpers/JsonValidator"
 
 interface ApiRequest {
     success: boolean,
-    data? : object
+    data? : string
 }
 
 class ItemsManager {
@@ -19,11 +18,10 @@ class ItemsManager {
 
     async getData () : Promise<ApiRequest> {
         const response = await Request.fetchData(this.generateLink(), {timeout: 10000});
-        if (response.success && response.body && JsonValidator.validate(response.body)) {
-            this.apiData = JSON.parse(response.body);
+        if (response.success && response.body) {
             return {
                 success : true,
-                data : this.apiData
+                data : response.body
             }
         }
         return {

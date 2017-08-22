@@ -2,6 +2,17 @@ import {IdManager} from "./IdManager"
 import {ItemsManager} from './ItemsManager'
 import * as moment from 'moment';
 import {Database, CrudResult} from "../Helpers/Database/Database"
+import * as fs from 'fs';
+import * as util from 'util';
+import {ApiValidator} from "./Validator"
+import {ApiRequest} from "./ApiRequest"
+import {RequestResponse} from "../Helpers/Request";
+
+interface ApiDescription {
+    time : string,
+    changeId : string,
+    exist : boolean
+}
 
 class UpdateDemon {
 
@@ -9,6 +20,7 @@ class UpdateDemon {
     private readonly officialApiDelay : number = 50;
     private readonly thirdPartyApiDelay : number = 3000;
     private itemsListIds : string[] = [];
+    private officialApiSavePath : string = `D:\\\\poe_api_temp_data\\official_api\\`;
 
     async officialApiUpdate () : Promise<void> {
         if (!this.currentId) {
@@ -20,21 +32,63 @@ class UpdateDemon {
                 return;
             }
         }
-        const itemsManager = new ItemsManager(this.currentId);
+        let response : RequestResponse;
+        try {
+            response = await ApiRequest.fetch(this.currentId)
+        } catch (err) {
+            this.retryUpdate(this.officialApiDelay);
+            return;
+        }
+        if (ApiValidator.validate(response.body) && response.body) {
+            const parsedData = JSON.parse(response.body);
+            this.currentId = parsedData['next_change_id'];
+
+            //it's ok
+        } else {
+            //not ok
+
+        }
+
+        this.retryUpdate(this.officialApiDelay);
+
+
+
+        /*const itemsManager = new ItemsManager(this.currentId);
         let apiResponse = await itemsManager.getData();
         if (!apiResponse.success) {
             this.retryUpdate(this.officialApiDelay);
             return;
         }
-        if (apiResponse.data && typeof apiResponse.data === 'object' && apiResponse.data['next_change_id']) {
-            apiResponse.data['_id'] = apiResponse.data['next_change_id'];
+        //validate here
+        const validator = new ApiValidator(apiResponse.data);*/
+
+
+        /*if (apiResponse.data && typeof apiResponse.data === 'object' && apiResponse.data['next_change_id']) {
+            const id = apiResponse.data['nex_change_id'];
+            const saveFileFunc = util.promisify(fs.writeFile);
+            saveFileFunc(this.officialApiSavePath + id + '.json', )
             let database = new Database();
             database.write('officialApi', [apiResponse.data]);
             //currently it's writing async without worry about the result
             this.currentId = apiResponse.data['next_change_id'];
         }
-        this.retryUpdate(this.officialApiDelay);
+        this.retryUpdate(this.officialApiDelay);*/
         return;
+    }
+
+    async saveDescription (apiResponse) {
+        return new Promise((resolve, reject) => {
+            if (!apiResponse.data || typeof apiResponse.data !== 'object' || !apiResponse.data['next_change_id']) {
+                return reject(false)
+            }
+
+        })
+    }
+
+    async getApiInfoFromDb () {
+        return new Promise((resolve, reject) => {
+
+        })
     }
 
     retryUpdate (timeout : number) : void {
@@ -88,3 +142,9 @@ class UpdateDemon {
 }
 
 export {UpdateDemon}
+
+let data = [{
+    time: moment().format('DD.MM.YY HH:mm:ss'),
+    changeId: 'someid',
+    exist: true
+}];

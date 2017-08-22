@@ -33,4 +33,4 @@ class Request {
 
 }
 
-export {Request}
+export {Request, RequestResponse}

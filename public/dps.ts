@@ -6,7 +6,10 @@ function simulateHit ({chanceToHit, minDamage, maxDamage, criticalChancePercents
     const isHit = Math.random()<(chanceToHit/100);
     if (!isHit) return 0;
 
-    const isHitCritical = Math.random()<(criticalChancePercents/100);
+    let isHitCritical = Math.random()<(criticalChancePercents/100);
+    /*if (!isHitCritical) {
+        isHitCritical = Math.random()<(criticalChancePercents/100)
+    }*/
     const isCriticalHitLanded = Math.random()<(chanceToHit/100);
 
     if (isHitCritical && isCriticalHitLanded) {
@@ -26,23 +29,23 @@ function calculateDps(options) {
 
 //crit now - 144%; 250 multi
 
-const tornadoDps = calculateDps({
-    chanceToHit: 91,
-    attackSpeed: 2,
-    minDamage: 571,
-    maxDamage: 1412,
-    criticalChancePercents: 34.4,
-    criticalDamagePercents: 369,
+const dpsNow = calculateDps({
+    chanceToHit: 100,
+    attackSpeed: 4.1,
+    minDamage: 2438,
+    maxDamage: 8337,
+    criticalChancePercents: 23.1,
+    criticalDamagePercents: 269,
     simulationNumber: 1000000
 });
 
-const tornadoDpsWithoutMisses = calculateDps({
-    chanceToHit: 100,
-    attackSpeed: 2,
-    minDamage: 571,
-    maxDamage: 1412,
-    criticalChancePercents: 34.4,
-    criticalDamagePercents: 369,
+const dpsOpus = calculateDps({
+    chanceToHit: 90,
+    attackSpeed: 4.1*0.8,
+    minDamage: 2438*(450/330),
+    maxDamage: 8337*(450/340),
+    criticalChancePercents: 24.55*1.48,
+    criticalDamagePercents: 269,
     simulationNumber: 1000000
 });
 
@@ -50,6 +53,7 @@ const tornadoDpsWithoutMisses = calculateDps({
 //and 4% boost from mine
 
 window.onload = function () {
-  document.body.innerHTML = `tornado dps now is ${tornadoDps}
-  <br>tornado dps increase is ${tornadoDpsWithoutMisses}; it's ${tornadoDpsWithoutMisses/tornadoDps} boost`;
+    document.body.innerHTML = `tornado dps now is ${dpsNow}
+  <br>tornado dps increase is ${dpsOpus}; it's ${dpsOpus/dpsNow} boost`;
 };
+

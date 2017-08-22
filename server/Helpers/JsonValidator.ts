@@ -1,7 +1,7 @@
 class JsonValidator {
-    static validate (json : string) : boolean {
+    static validate (possibleJson : any) : boolean {
         try {
-            JSON.parse(json)
+            JSON.parse(possibleJson)
         } catch (err) {
             return false;
         }
