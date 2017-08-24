@@ -4,7 +4,7 @@ import * as moment from 'moment';
 import {Database, CrudResult} from "../Helpers/Database/Database"
 import * as fs from 'fs';
 import * as util from 'util';
-import {ApiValidator} from "./Validator"
+import {ApiValidator} from "./ApiValidator"
 import {ApiRequest} from "./ApiRequest"
 import {RequestResponse} from "../Helpers/Request";
 
@@ -42,7 +42,8 @@ class UpdateDemon {
         if (ApiValidator.validate(response.body) && response.body) {
             const parsedData = JSON.parse(response.body);
             this.currentId = parsedData['next_change_id'];
-
+            //update demon shouldn't validate fully data - juust check if it has id
+            //it's very time expensive procedure (100+ms)
             //it's ok
         } else {
             //not ok

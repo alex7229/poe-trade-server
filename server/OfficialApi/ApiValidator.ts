@@ -205,7 +205,7 @@ class ApiValidator {
             },
             additionalProperties : false,
             patternProperties: {
-                "^[\\s]*raceReward$": {
+                "^[\\s]*RaceReward$": {
                     type: "boolean"
                 }
             },
