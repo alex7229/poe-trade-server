@@ -1,7 +1,11 @@
 class JsonValidator {
-    static validate (possibleJson : any) : possibleJson is string {
+    // workaround for 'no-any'
+    static validate (possibleJson: string | object | undefined | number | null): possibleJson is string {
+        if (typeof possibleJson !== 'string') {
+            return false;
+        }
         try {
-            JSON.parse(possibleJson)
+            JSON.parse(possibleJson);
         } catch (err) {
             return false;
         }
@@ -9,4 +13,4 @@ class JsonValidator {
     }
 }
 
-export {JsonValidator}
+export {JsonValidator};

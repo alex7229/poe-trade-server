@@ -1,22 +1,23 @@
+import { RequestResponse } from 'request';
 import * as request from 'request';
 
-interface RequestResponse {
-    response: any,
-    success : boolean,
-    error? : string,
-    body? : string
+interface Response {
+    response: RequestResponse;
+    success: boolean;
+    error?: string;
+    body?: string;
 }
 
 class Request {
 
-    static fetchData (url : string, customOptions : Object = {}) : Promise<RequestResponse> {
+    static fetchData (url: string, customOptions: {} = {}): Promise<Response> {
         return new Promise((resolve) => {
             const defaultOptions = {
                 url,
                 gzip: true
             };
-            request(Object.assign(defaultOptions, customOptions), function (error, response, body) {
-                let result : RequestResponse = {
+            const callback: request.CoreOptions['callback'] = (error, response, body) => {
+                let result: Response = {
                     response,
                     success : true
                 };
@@ -26,11 +27,12 @@ class Request {
                 } else {
                     result.body = body;
                 }
-                resolve(result)
-            });
-        })
+                resolve(result);
+            };
+            request(Object.assign(defaultOptions, customOptions), callback);
+        });
     }
 
 }
 
-export {Request, RequestResponse}
+export {Request, Response};
