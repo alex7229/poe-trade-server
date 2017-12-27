@@ -1,16 +1,15 @@
-import {JsonValidator} from "../Helpers/JsonValidator"
 import * as Ajv from 'ajv';
 
-class ApiValidator {
+export class ApiValidator {
 
-    public static validate (rawData: any) : boolean {
-        //account name sometimes can be null instead of string
-        //url format of icon sometimes is invalid for  some reason (but url seems fine)
+    public static validate (rawData: string): boolean {
+        // account name sometimes can be null instead of string
+        // url format of icon sometimes is invalid for  some reason (but url seems fine)
 
         const colourSchema = {
             type: 'string',
             pattern: '^[SGID]$'
-            //s -> str -> red, d -> dex -> green, i -> int -> blue, d -> white
+            // s -> str -> red, d -> dex -> green, i -> int -> blue, d -> white
         };
 
         const valuesSchema = {
@@ -54,17 +53,17 @@ class ApiValidator {
                 socket: {
                     type: 'number'
                 },
-                //colour and socket are specific only to socketed item
+                // colour and socket are specific only to socketed item
                 isRelic: {
                     type: 'boolean'
                 },
-                artFilename : {
+                artFilename: {
                     type: 'string'
                 },
                 corrupted: {
                     type: 'boolean'
                 },
-                descrText : {
+                descrText: {
                     type: 'string'
                 },
                 secDescrText: {
@@ -80,7 +79,7 @@ class ApiValidator {
                         type: 'string'
                     }
                 },
-                socketedItems : {
+                socketedItems: {
                     type: 'array',
                     maxItems: 0
                 },
@@ -117,42 +116,42 @@ class ApiValidator {
                 },
                 flavourText: {
                     type: 'array',
-                        items : {
+                        items: {
                         type: 'string'
                     }
                 },
                 frameType: {
                     type: 'number'
                 },
-                icon : {
+                icon: {
                     type: 'string'
                 },
                 talismanTier: {
                     type: 'number'
                 },
-                id : {
+                id: {
                     type: 'string'
                 },
                 identified: {
                     type: 'boolean'
                 },
-                ilvl : {
+                ilvl: {
                     type: 'integer'
                 },
-                inventoryId : {
+                inventoryId: {
                     type: 'string'
                 },
-                league : {
+                league: {
                     type: 'string',
-                    //harbinger, hc, standard, ssf and else
+                    // harbinger, hc, standard, ssf and else
                 },
-                lockedToCharacter : {
+                lockedToCharacter: {
                     type: 'boolean'
                 },
                 name: {
                     type: 'string'
                 },
-                properties : regularArraySchema,
+                properties: regularArraySchema,
                 requirements: regularArraySchema,
                 implicitMods: {
                     type: 'array',
@@ -161,7 +160,7 @@ class ApiValidator {
                     }
                 },
                 sockets: {
-                    type : 'array',
+                    type: 'array',
                         items: {
                         type: 'object',
                             properties: {
@@ -176,50 +175,50 @@ class ApiValidator {
                     type: 'string'
                 },
                 w: {
-                    //item width
+                    // item width
                     type: 'number'
                 },
                 h: {
-                    //item height
+                    // item height
                     type: 'number'
                 },
                 x: {
-                    //position x
+                    // position x
                     type: 'number'
                 },
                 y: {
-                    //position y
+                    // position y
                     type: 'number'
                 },
-                note : {
+                note: {
                     type: 'string'
-                    //that's buyout property
+                    // that's buyout property
                 },
                 cosmeticMods: {
-                    //irrelevant
+                    // irrelevant
                     type: 'array',
                         items: {
                         type: 'string'
                     }
                 }
             },
-            additionalProperties : false,
+            additionalProperties: false,
             patternProperties: {
-                "^[\\s]*RaceReward$": {
-                    type: "boolean"
+                '^[\\s]*RaceReward$': {
+                    type: 'boolean'
                 }
             },
         };
 
         const socketedItemSchemaJson = JSON.stringify(socketedItemSchema);
         let regularItemSchema = JSON.parse(socketedItemSchemaJson);
-        //temp. solution for deep copy of object
-        delete regularItemSchema['properties']['socketedItems']['maxItems'];
+        // temp. solution for deep copy of object
+        /*delete regularItemSchema['properties']['socketedItems']['maxItems'];
         regularItemSchema['properties']['socketedItems'] = {
             type: 'array',
             items: socketedItemSchema
-        };
-        //regular item can contain array of socketed items inside
+        };*/
+        // regular item can contain array of socketed items inside
 
         let schema = {
             type: 'object',
@@ -239,19 +238,19 @@ class ApiValidator {
                                     type: 'null'
                                 }]
                             },
-                            id : {
+                            id: {
                                 type: 'string'
                             },
-                            lastCharacterName : {
+                            lastCharacterName: {
                                 type: 'string'
                             },
-                            'public' : {
+                            'public': {
                                 type: 'boolean'
                             },
-                            stash : {
+                            stash: {
                                 type: 'string'
                             },
-                            stashType : {
+                            stashType: {
                                 type: 'string'
                             },
                             items: {
@@ -263,29 +262,22 @@ class ApiValidator {
                 }
             }
         };
-        console.time('parse');
-        //"http://web.poecdn.com/image/Art/2DItems/Weapons/TwoHandWeapons/Staves/Rage Staff.png?scale=1&w=2&h=4&v=85aeb112091552131f20ccdaaa3be4203"
-        //this uri is not matched like url
         let validator  = new Ajv();
-        let parsedData : object;
+        let parsedData: object;
         try {
             parsedData = JSON.parse(rawData);
-            console.timeEnd('parse');
-        } catch(err) {
+        } catch (err) {
             return false;
         }
-        console.time('validation');
         const valid = validator.validate(schema, parsedData);
         const errors = validator.errors;
-        console.timeEnd('validation');
-        //debugger;
-        if (errors!== null) {
-            debugger;
+        // debugger;
+        if (errors !== null) {
+            // debugger;
         }
-        return errors === null;
-
-
+        if (valid) {
+            return true;
+        }
+        return false;
     }
 }
-
-export {ApiValidator}

@@ -1,10 +1,11 @@
 import { Request, Response } from '../../Helpers/Request';
 import { JsonValidator } from '../../Helpers/JsonValidator';
 import * as Ajv from 'ajv';
+import { Currency, PoeNinjaInterface } from '../../types';
 
 export class PoeNinja {
 
-    public static async fetchList (): Promise<CurrencyEquivalent[]> {
+    public static async fetchList (): Promise<Currency.ChaosEquivalent[]> {
         let response: Response;
         try {
             response = await Request.fetchData(`http://poe.ninja/api/Data/GetCurrencyOverview?league=Abyss`);
@@ -21,7 +22,7 @@ export class PoeNinja {
         throw new Error('unexpected errors occurred with poeNinja currency validating');
     }
 
-    private static validateResponse (apiData: object): apiData is PoeNinjaApiInterface {
+    private static validateResponse (apiData: object): apiData is PoeNinjaInterface.Api {
         const payReceiveSchema = {
             oneof: [
                 {type: null},
@@ -78,16 +79,7 @@ export class PoeNinja {
                             },
                             poeTradeId: {
                                 type: 'number'
-                            }/*,
-                            type: {
-                                type: 'number'
-                            },
-                            shorthands: {
-                                type: 'array',
-                                items: {
-                                    type: 'string'
-                                }
-                            }*/
+                            }
                         }
                     }
                 },
@@ -123,7 +115,7 @@ export class PoeNinja {
         return false;
     }
 
-    private static parseResponse (data: PoeNinjaApiInterface): CurrencyEquivalent[] {
+    private static parseResponse (data: PoeNinjaInterface.Api): Currency.ChaosEquivalent[] {
         const values = data.lines;
         return  values.map(value => {
             let chaosEquivalent;
@@ -132,7 +124,7 @@ export class PoeNinja {
             }
             return {
                 name: value.currencyTypeName,
-                chaosEquivalent
+                value: chaosEquivalent
             };
         });
     }

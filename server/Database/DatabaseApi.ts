@@ -1,12 +1,10 @@
 import * as mongodb from 'mongodb';
 import { Collection, Db } from 'mongodb';
+import * as assert from 'assert';
 
 // "C:\Program Files\MongoDB\Server\3.4\bin\mongod.exe" --dbpath  D:\OneDrive\mongoData - starting mongodb
 
 const MongoClient = mongodb.MongoClient;
-/*import * as Db from 'mongodb/lib/db.js'*/
-/*import * as Collection from 'mongodb/lib/collection.js'*/
-import * as assert from 'assert';
 
 interface ConnectionInfo {
     success: boolean;
@@ -20,7 +18,7 @@ interface CrudResult {
     data ?: {}[];
 }
 
-class Database {
+class DatabaseApi {
 
     private url: string = 'mongodb://localhost:27017/poe_server_test';
 
@@ -139,4 +137,4 @@ class Database {
     }
 }
 
-export {Database, CrudResult};
+export {DatabaseApi, CrudResult};

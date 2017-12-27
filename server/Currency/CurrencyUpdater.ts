@@ -1,6 +1,7 @@
 import { PoeNinja } from './api/PoeNinja';
-import { DatabaseApi } from './api/DatabaseApi';
+import { DatabaseCurrency } from '../Database/DatabaseCurrency';
 import * as moment from 'moment';
+import { Currency } from '../types';
 
 export class CurrencyUpdater {
 
@@ -11,7 +12,7 @@ export class CurrencyUpdater {
     }
 
     private static async update(): Promise<boolean> {
-        const dbInstance = new DatabaseApi();
+        const dbInstance = new DatabaseCurrency();
         let list;
         try {
             list = await dbInstance.fetchLatestListFromDb();
@@ -26,8 +27,8 @@ export class CurrencyUpdater {
 
     private static async fetchAndSaveList (): Promise<boolean> {
         try {
-            const listFromApi: CurrencyEquivalent[] = await PoeNinja.fetchList();
-            const db = new DatabaseApi();
+            const listFromApi: Currency.ChaosEquivalent[] = await PoeNinja.fetchList();
+            const db = new DatabaseCurrency();
             await db.saveListToDb({
                 exchangeRates: listFromApi,
                 updateTime: moment.now()
@@ -38,7 +39,7 @@ export class CurrencyUpdater {
         return true;
     }
 
-    private static isListOutdated(list: CurrencyList): boolean {
+    private static isListOutdated(list: Currency.DatabaseList): boolean {
         const now = moment();
         return now.diff(list.updateTime, 'hours') >= 3;
     }

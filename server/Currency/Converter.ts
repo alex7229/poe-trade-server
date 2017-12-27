@@ -1,9 +1,11 @@
-export class Convertor {
+import { Currency } from '../types';
 
-    private list: CurrencyEquivalent[];
-    private from: Currency;
+export class Converter {
+
+    private list: Currency.ChaosEquivalent[];
+    private from: Currency.Quantity;
     private to: string;
-    private shorthands: Shorthand[] = [
+    private shorthands: Currency.Shorthand[] = [
         {name: 'Orb of Alteration', shorthands: ['alt', 'alts', 'alteration']},
         {name: 'Orb of Fusing', shorthands: ['fus', 'fuse', 'fusing', 'fusings']},
         {name: 'Orb of Alchemy', shorthands: ['alc', 'alch', 'alchemy']},
@@ -23,24 +25,24 @@ export class Convertor {
     ];
     private decimalPrecision: number;
 
-    constructor (list: CurrencyEquivalent[], from: Currency, to: string, decimalPrecision: number = 2) {
+    constructor (list: Currency.ChaosEquivalent[], from: Currency.Quantity, to: string, decimalPrecision: number = 2) {
         this.list = list;
         this.from = from;
         this.to = to;
         this.decimalPrecision = decimalPrecision;
     }
 
-    public convert(): Currency {
+    public convert(): Currency.Quantity {
         const fromName = this.findNameFromShorthand(this.from.name);
         const toName = this.findNameFromShorthand(this.to);
-        const fromCurrency: CurrencyEquivalent = this.findCurrencyByName(fromName);
-        const toCurrency: CurrencyEquivalent = this.findCurrencyByName(toName);
-        if (!fromCurrency.chaosEquivalent || !toCurrency.chaosEquivalent) {
+        const fromCurrency: Currency.ChaosEquivalent = this.findCurrencyByName(fromName);
+        const toCurrency: Currency.ChaosEquivalent = this.findCurrencyByName(toName);
+        if (!fromCurrency.value || !toCurrency.value) {
             let errorMessage = 'Cannot convert currencies. One or both of them don\'t have chaosEquivalent';
             errorMessage += '. Probably they are too rare.';
             throw new Error(errorMessage);
         }
-        let value = this.from.value * fromCurrency.chaosEquivalent / toCurrency.chaosEquivalent;
+        let value = this.from.value * fromCurrency.value / toCurrency.value;
         value = Math.round(value * (10 ** this.decimalPrecision)) / (10 ** this.decimalPrecision);
         return {
             name: toName,
@@ -49,7 +51,7 @@ export class Convertor {
     }
 
     private findNameFromShorthand(possibleShorthand: string): string {
-        const foundedCurrency = this.shorthands.find((currency: Shorthand) => {
+        const foundedCurrency = this.shorthands.find((currency: Currency.Shorthand) => {
             return currency.shorthands.includes(possibleShorthand);
         });
         if (foundedCurrency) {
@@ -58,14 +60,14 @@ export class Convertor {
         return possibleShorthand;
     }
 
-    private findCurrencyByName(name: string): CurrencyEquivalent {
+    private findCurrencyByName(name: string): Currency.ChaosEquivalent {
         if (name === 'Chaos Orb') {
             return {
                 name: 'Chaos Orb',
-                chaosEquivalent: 1
+                value: 1
             };
         }
-        const foundedCurrency = this.list.find((currency: CurrencyEquivalent) => {
+        const foundedCurrency = this.list.find((currency: Currency.ChaosEquivalent) => {
             return currency.name === name;
         });
         if (!foundedCurrency) {

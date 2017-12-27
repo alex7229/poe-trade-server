@@ -1,12 +1,13 @@
-import { Database, CrudResult } from '../../Helpers/Database/Database';
+import { DatabaseApi, CrudResult } from './DatabaseApi';
+import { Currency } from '../types';
 import * as Ajv from 'ajv';
 
-export class DatabaseApi {
+export class DatabaseCurrency {
     // divide this class in two - currency manager and poe.ninja.manager
     private dbCollectionName: string = 'currency';
 
-    public async fetchLatestListFromDb (): Promise<CurrencyList> {
-        const db = new Database();
+    public async fetchLatestListFromDb (): Promise<Currency.DatabaseList> {
+        const db = new DatabaseApi();
         const result: CrudResult = await db.read(this.dbCollectionName, {'updateTime': -1}, 1);
         if (!result.success || !result.data) {
             throw new Error('Error while fetching currency list from db. Check it existence');
@@ -18,18 +19,18 @@ export class DatabaseApi {
         return list;
     }
 
-    public async saveListToDb(list: CurrencyList): Promise<void> {
+    public async saveListToDb(list: Currency.DatabaseList): Promise<void> {
         if (!this.validateList(list)) {
             throw new Error('Currency list for saving is invalid');
         }
-        const db = new Database();
+        const db = new DatabaseApi();
         const writingResult: CrudResult = await db.write(this.dbCollectionName, [list]);
         if (!writingResult.success) {
             throw new Error('There were some problems while saving currency list to db');
         }
     }
 
-    private validateList(list: object): list is CurrencyList {
+    private validateList(list: object): list is Currency.DatabaseList {
         const schema = {
             type: 'object',
             properties: {

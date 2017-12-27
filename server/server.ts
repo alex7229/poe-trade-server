@@ -6,16 +6,9 @@ demon.officialApiUpdate();
 */
 
 import { CurrencyUpdater } from './Currency/CurrencyUpdater';
-import { Convertor as CurrencyConvertor } from './Currency/Convertor';
-import { DatabaseApi as CurrencyDbApi } from './Currency/api/DatabaseApi';
-import { RequestParamHandler, Response } from 'express';
-
-interface CurrencyRequest extends RequestParamHandler {
-    body: {
-        from: Currency,
-        to: string
-    };
-}
+import { Converter as CurrencyConverter } from './Currency/Converter';
+import { DatabaseCurrency as CurrencyDbApi } from './Database/DatabaseCurrency';
+import { Server, Currency } from './types';
 
 CurrencyUpdater.run();
 
@@ -28,19 +21,23 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 
-app.post('/convertCurrency', (req: CurrencyRequest, res: Response) => {
+app.post('/convertCurrency', (req: Server.CurrencyRequest, res: Server.ServerResponse) => {
     const fromCurrency = req.body.from;
     const toCurrencyName = req.body.to;
     const dbInstance = new CurrencyDbApi();
     dbInstance.fetchLatestListFromDb()
-        .then((currencyList: CurrencyList) => {
-            const convertor = new CurrencyConvertor(currencyList.exchangeRates, fromCurrency, toCurrencyName);
-            const converted: Currency = convertor.convert();
+        .then((currencyList: Currency.DatabaseList) => {
+            const converter = new CurrencyConverter(currencyList.exchangeRates, fromCurrency, toCurrencyName);
+            const converted: Currency.Quantity = converter.convert();
             res.end(JSON.stringify(converted));
         })
         .catch((err) => {
             res.status(500).send('Cannot convert');
         });
+});
+
+app.post('/addFilter', (req: Server.AddFilterRequest, res: Server.ServerResponse) => {
+    res.end('not finished');
 });
 
 app.listen(3001);
