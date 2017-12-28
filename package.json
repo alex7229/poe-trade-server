@@ -18,6 +18,6 @@
     "request": "^2.83.0"
   },
   "scripts": {
-    "debug": "nodemon --inspect-brk server/server.js"
+    "debug": "nodemon --watch server/ --inspect-brk server/server.js"
   }
 }
