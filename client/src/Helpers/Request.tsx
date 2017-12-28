@@ -8,6 +8,17 @@ export class Request {
             headers,
             body: data
         });
-        return result.json();
+        return result.text();
+    }
+
+    static async fetchGetJson(url: string): Promise<string> {
+        let headers = new Headers();
+        headers.append('Accept', 'application/json');
+        headers.append('Content-Type', 'application/json');
+        const response = await fetch(url, {
+            method: 'GET',
+            headers
+        });
+        return response.text();
     }
 }

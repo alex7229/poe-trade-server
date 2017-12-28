@@ -1,4 +1,4 @@
-import {Request, RequestResponse} from "../Helpers/Request"
+import {Request, RequestResponse} from "../Requests/Request"
 
 class ApiRequest {
 

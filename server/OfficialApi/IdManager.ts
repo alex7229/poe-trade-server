@@ -1,4 +1,4 @@
-import {Request} from '../Helpers/Request'
+import {Request} from '../Requests/Request'
 import {JsonValidator} from '../Helpers/JsonValidator'
 
 interface ApiData {

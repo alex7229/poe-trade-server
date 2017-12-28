@@ -1,7 +1,7 @@
 import { IdManager } from './IdManager';
 import { ApiValidator } from './ApiValidator';
 import { ApiRequest } from './ApiRequest';
-import { Response } from '../Helpers/Request';
+// import { Response } from '../Requests/Request';
 
 /*interface ApiDescription {
     time: string;

@@ -1,28 +1,19 @@
 import * as mongodb from 'mongodb';
 import { Collection, Db } from 'mongodb';
 import * as assert from 'assert';
+import { Database } from '../types';
+import CrudResult = Database.CrudResult;
+import ConnectionInfo = Database.ConnectionInfo;
 
 // "C:\Program Files\MongoDB\Server\3.4\bin\mongod.exe" --dbpath  D:\OneDrive\mongoData - starting mongodb
 
 const MongoClient = mongodb.MongoClient;
 
-interface ConnectionInfo {
-    success: boolean;
-    db: Db;
-    error ?: Error;
-}
-
-interface CrudResult {
-    success: boolean;
-    error ?: Error;
-    data ?: {}[];
-}
-
-class DatabaseApi {
+export class DatabaseApi {
 
     private url: string = 'mongodb://localhost:27017/poe_server_test';
 
-    public async read(collectionName: string, sortObject: object = {},  limit: void | number): Promise<CrudResult> {
+    protected async read(collectionName: string, sortObject: object = {},  limit: void | number): Promise<CrudResult> {
         // sortObject example  {'time.timeInMs': -1} -> will sort time.timeInMs field in descending order (later first)
         let result: CrudResult = {
             success: true
@@ -47,7 +38,7 @@ class DatabaseApi {
         return readResult;
     }
 
-    public async write(collectionName: string, data: {}[]): Promise<CrudResult> {
+    protected async write(collectionName: string, data: {}[]): Promise<CrudResult> {
         let result: CrudResult = {
             success: true
         };
@@ -136,5 +127,3 @@ class DatabaseApi {
         db.close();
     }
 }
-
-export {DatabaseApi, CrudResult};

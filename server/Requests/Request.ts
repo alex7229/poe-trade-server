@@ -1,29 +1,25 @@
-import { RequestResponse } from 'request';
 import * as request from 'request';
+import { RequestInterface } from '../types';
 
-interface Response {
-    response: RequestResponse;
-    success: boolean;
-    error?: string;
-    body?: string;
-}
+export class Request {
 
-class Request {
-
-    static fetchData (url: string, customOptions: {} = {}): Promise<Response> {
+    protected fetchData (url: string, customOptions: {} = {}): Promise<RequestInterface.Response> {
         return new Promise((resolve) => {
             const defaultOptions = {
                 url,
                 gzip: true
             };
             const callback: request.CoreOptions['callback'] = (error, response, body) => {
-                let result: Response = {
+                let result: RequestInterface.Response = {
                     response,
-                    success : true
+                    success : true,
+                    body: ''
                 };
                 if (error) {
                     result.success = false;
                     result.error = error;
+                } else if (typeof result.body !== 'string') {
+                    result.body = JSON.stringify(body);
                 } else {
                     result.body = body;
                 }
@@ -34,5 +30,3 @@ class Request {
     }
 
 }
-
-export {Request, Response};

@@ -1,5 +1,5 @@
 import {IdManager} from "./IdManager"
-import {Request} from "../Helpers/Request"
+import {Request} from "../Requests/Request"
 
 interface ApiRequest {
     success: boolean,

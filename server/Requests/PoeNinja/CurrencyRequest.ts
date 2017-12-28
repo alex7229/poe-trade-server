@@ -1,28 +1,31 @@
-import { Request, Response } from '../../Helpers/Request';
+import { Request } from '../Request';
 import { JsonValidator } from '../../Helpers/JsonValidator';
 import * as Ajv from 'ajv';
-import { Currency, PoeNinjaInterface } from '../../types';
+import { Currency, PoeNinjaInterface, RequestInterface } from '../../types';
 
-export class PoeNinja {
+export class CurrencyRequest extends Request {
 
-    public static async fetchList (): Promise<Currency.ChaosEquivalent[]> {
-        let response: Response;
+    private url: string = 'http://poe.ninja/api/Data/GetCurrencyOverview?league=Abyss';
+    private errorMessage: string = 'Data returned via poe.ninja api is not valid';
+
+    public async fetchList (): Promise<Currency.ChaosEquivalent[]> {
+        let response: RequestInterface.Response;
         try {
-            response = await Request.fetchData(`http://poe.ninja/api/Data/GetCurrencyOverview?league=Abyss`);
+            response = await this.fetchData(this.url);
         } catch (err) {
-            throw new Error(`api didn't respond to request`);
+            throw new Error(`api hasn't respond to request`);
         }
         if (!JsonValidator.validate(response.body)) {
-            throw new Error(`data returned via api is not correct`);
+            throw new Error(this.errorMessage);
         }
         const responseData = JSON.parse(response.body);
-        if (PoeNinja.validateResponse(responseData)) {
-            return PoeNinja.parseResponse(responseData);
+        if (this.validateResponse(responseData)) {
+            return this.parseResponse(responseData);
         }
         throw new Error('unexpected errors occurred with poeNinja currency validating');
     }
 
-    private static validateResponse (apiData: object): apiData is PoeNinjaInterface.Api {
+    private validateResponse (apiData: object): apiData is PoeNinjaInterface.Api {
         const payReceiveSchema = {
             oneof: [
                 {type: null},
@@ -115,7 +118,7 @@ export class PoeNinja {
         return false;
     }
 
-    private static parseResponse (data: PoeNinjaInterface.Api): Currency.ChaosEquivalent[] {
+    private parseResponse (data: PoeNinjaInterface.Api): Currency.ChaosEquivalent[] {
         const values = data.lines;
         return  values.map(value => {
             let chaosEquivalent;

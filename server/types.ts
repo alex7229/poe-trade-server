@@ -1,6 +1,8 @@
 import * as express from 'express';
+import { Db } from 'mongodb';
+import { RequestResponse } from 'request';
 
-namespace Server {
+export namespace Server {
 
     export interface CurrencyRequest extends express.RequestParamHandler {
         body: {
@@ -18,7 +20,7 @@ namespace Server {
     export interface ServerResponse extends express.Response {}
 }
 
-namespace Currency {
+export namespace Currency {
     export interface Quantity {
         value: number;
         name: string;
@@ -40,7 +42,7 @@ namespace Currency {
     }
 }
 
-namespace Filters {
+export namespace Filters {
     export interface FilterParameter {
         name: string;
         min: number;
@@ -53,7 +55,7 @@ namespace Filters {
     }
 }
 
-namespace PoeNinjaInterface {
+export namespace PoeNinjaInterface {
     export interface PayReceive {
         count: number;
         dataPointCount: number;
@@ -70,7 +72,7 @@ namespace PoeNinjaInterface {
         id: number;
         icon: string;
         name: string;
-        poeTradeId: number
+        poeTradeId: number;
     }
 
     export interface Lines {
@@ -88,4 +90,25 @@ namespace PoeNinjaInterface {
     }
 }
 
-export { Server, Currency, PoeNinjaInterface, Filters };
+export namespace Database {
+    export interface ConnectionInfo {
+        success: boolean;
+        db: Db;
+        error ?: Error;
+    }
+
+    export interface CrudResult {
+        success: boolean;
+        error ?: Error;
+        data ?: {}[];
+    }
+}
+
+export namespace RequestInterface {
+    export interface Response {
+        response: RequestResponse;
+        success: boolean;
+        error?: Error;
+        body: string;
+    }
+}
