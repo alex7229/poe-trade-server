@@ -1,13 +1,20 @@
 import * as React from 'react';
 import { Request } from '../Helpers/Request';
-import { CurrencyRatesComponent } from '../types';
-import Props = CurrencyRatesComponent.Props;
-import State = CurrencyRatesComponent.State;
+import { Currency } from '../types';
 import { SmartInput } from './SmartInput';
+
+interface Props {
+    currencyFrom: Currency.Quantity;
+    currencyToName: string;
+}
+
+interface State {
+    currencyNames: string[];
+}
 
 export class CurrencyRates extends React.Component<Props, State> {
 
-    constructor(props: CurrencyRatesComponent.Props) {
+    constructor(props: Props) {
         super(props);
         this.state = {currencyNames: []};
     }

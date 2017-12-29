@@ -59,7 +59,7 @@ export class UpdateDemon {
             const id = apiResponse.data['nex_change_id'];
             const saveFileFunc = util.promisify(fs.writeFile);
             saveFileFunc(this.officialApiSavePath + id + '.json', )
-            let database = new Database();
+            let database = new databasesApi();
             database.write('officialApi', [apiResponse.data]);
             //currently it's writing async without worry about the result
             this.currentId = apiResponse.data['next_change_id'];

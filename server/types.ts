@@ -53,6 +53,12 @@ export namespace Filters {
         name: string;
         body: FilterParameter[];
     }
+
+    export interface Modifier {
+        type: string;
+        name: string;
+    }
+
 }
 
 export namespace PoeNinjaInterface {

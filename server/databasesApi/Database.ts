@@ -1,15 +1,15 @@
 import * as mongodb from 'mongodb';
 import { Collection, Db } from 'mongodb';
 import * as assert from 'assert';
-import { Database } from '../types';
-import CrudResult = Database.CrudResult;
-import ConnectionInfo = Database.ConnectionInfo;
+import { Database as DatabaseInterface } from '../types';
+import CrudResult = DatabaseInterface.CrudResult;
+import ConnectionInfo = DatabaseInterface.ConnectionInfo;
 
 // "C:\Program Files\MongoDB\Server\3.4\bin\mongod.exe" --dbpath  D:\OneDrive\mongoData - starting mongodb
 
 const MongoClient = mongodb.MongoClient;
 
-export class DatabaseApi {
+export class Database {
 
     private url: string = 'mongodb://localhost:27017/poe_server_test';
 

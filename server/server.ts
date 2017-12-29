@@ -5,12 +5,17 @@ let demon = new UpdateDemon();
 demon.officialApiUpdate();
 */
 
-import { CurrencyUpdater } from './Currency/CurrencyUpdater';
+import { CurrencyUpdater } from './Updaters/CurrencyUpdater';
 import { Server } from './types';
-import { RequestParamHandler } from 'express';
-import { LatestIdRequest } from './Requests/PoeNinja/LatestIdRequest';
 import * as compression from 'compression';
-import { router as currencyRouter } from './Routes/Currency';
+import { CurrencyRouter } from './routers/CurrencyRouter';
+import { ModifiersRouter } from './routers/ModifiersRouter';
+import { OfficialApiRouter } from './routers/OfficialApiRouter';
+/*
+import { ModifiersRequest } from './Requests/PoeTrade/ModifiersRequest';
+
+let request = new ModifiersRequest();
+request.getModifiers();*/
 
 CurrencyUpdater.run();
 
@@ -25,22 +30,9 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 
-/*app.use((req: RequestParamHandler, res: Server.ServerResponse) => {
-    res.setHeader('Content-Type', 'application/json');
-});*/
-
-app.use('/currency', currencyRouter);
-
-app.get('/findLatestId', (req: RequestParamHandler, res: Server.ServerResponse) => {
-    const request = new LatestIdRequest();
-    request.getLatestApiId()
-        .then((id) => {
-            res.end((JSON.stringify({id})));
-        })
-        .catch(err => {
-            res.status(500).end(err.message);
-        });
-});
+app.use('/currency', CurrencyRouter);
+app.use('/modifiers', ModifiersRouter);
+app.use('/officialApi', OfficialApiRouter);
 
 app.post('/addFilter', (req: Server.AddFilterRequest, res: Server.ServerResponse) => {
     res.end('not finished');

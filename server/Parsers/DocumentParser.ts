@@ -1,4 +1,4 @@
-import { Tag, TagData } from '../../Helpers/TagParser';
+import { Tag, TagData } from '../../helpers/TagParser';
 
 class DocumentParser {
 

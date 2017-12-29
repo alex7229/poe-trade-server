@@ -1,5 +1,5 @@
 import { Request } from '../Request';
-import { JsonValidator } from '../../Helpers/JsonValidator';
+import { JsonValidator } from '../../validators/JsonValidator';
 import * as Ajv from 'ajv';
 import { Currency, PoeNinjaInterface, RequestInterface } from '../../types';
 

@@ -1,12 +1,12 @@
 import { Currency, Server } from '../types';
 import { RequestParamHandler } from 'express';
-import { DatabaseCurrency as CurrencyDbApi } from '../Database/DatabaseCurrency';
+import { CurrencyDatabase as CurrencyDbApi } from '../databasesApi/CurrencyDatabase';
 import { Converter as CurrencyConverter } from '../Currency/Converter';
 
 const express = require('express');
-const router = express.Router();
+const CurrencyRouter = express.Router();
 
-router.get('/names', (req: RequestParamHandler, res: Server.ServerResponse) => {
+CurrencyRouter.get('/names', (req: RequestParamHandler, res: Server.ServerResponse) => {
     const dbInstance = new CurrencyDbApi();
     dbInstance.fetchLatestListFromDb()
         .then((currencyList: Currency.DatabaseList) => {
@@ -20,7 +20,7 @@ router.get('/names', (req: RequestParamHandler, res: Server.ServerResponse) => {
         });
 });
 
-router.post('/convert', (req: Server.CurrencyRequest, res: Server.ServerResponse) => {
+CurrencyRouter.post('/convert', (req: Server.CurrencyRequest, res: Server.ServerResponse) => {
     const fromCurrency = req.body.from;
     const toCurrencyName = req.body.to;
     const dbInstance = new CurrencyDbApi();
@@ -35,4 +35,4 @@ router.post('/convert', (req: Server.CurrencyRequest, res: Server.ServerResponse
         });
 });
 
-export { router };
+export { CurrencyRouter };

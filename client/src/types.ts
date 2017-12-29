@@ -1,27 +1,14 @@
-export namespace CurrencyRatesComponent {
-    export interface Currency {
+export namespace Currency {
+    export interface Quantity {
         name: string;
         value: number;
     }
-    
-    export interface Props {
-        currencyFrom: Currency;
-        currencyToName: string;
-    }
-
-    export interface State {
-        currencyNames: string[];
-    }
 }
 
-export namespace SmartInputComponent {
-    export interface Props {
-        values: string[];
-        limit: number;
-    }
-
-    export interface State {
-        input: string;
-        possibleValues: string[];
+export namespace Modifiers {
+    export interface Modifier {
+        name: string;
+        active: boolean;
+        type: string;
     }
 }

@@ -1,7 +1,14 @@
 import * as React from 'react';
-import { SmartInputComponent } from '../types';
-import Props = SmartInputComponent.Props;
-import State = SmartInputComponent.State;
+
+interface Props {
+    values: string[];
+    limit: number;
+}
+
+interface State {
+    input: string;
+    possibleValues: string[];
+}
 
 export class SmartInput extends React.Component<Props, State> {
     constructor (props: Props) {
@@ -32,6 +39,9 @@ export class SmartInput extends React.Component<Props, State> {
     }
 
     getPossibleValues(currentInput: string): string[] {
+        if (currentInput === '') {
+            return [];
+        }
         return this.props.values.filter((value) => {
             const regExp = new RegExp(currentInput, 'i');
             return regExp.test(value);

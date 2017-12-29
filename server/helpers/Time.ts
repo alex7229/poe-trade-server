@@ -1,11 +1,11 @@
 import * as moment from 'moment';
-import {Moment} from "moment";
+import { Moment } from 'moment';
 import Base = moment.unitOfTime.Base;
 
 class Time {
 
-    private rawTime : string;
-    private possibleUnits : string[] = [
+    private rawTime: string;
+    private possibleUnits: string[] = [
         'seconds',
         'minutes',
         'hours',
@@ -16,17 +16,17 @@ class Time {
     ];
     private parsedTime: Moment;
 
-    constructor (rawTime : string) {
+    constructor (rawTime: string) {
         this.rawTime = rawTime;
         this.parseTime();
     }
 
-    public getMomentTime() : Moment {
-        return this.parsedTime
+    public getMomentTime(): Moment {
+        return this.parsedTime;
     }
 
-    public getStringTime() : string {
-        return this.parsedTime.format('DD.MM.YY HH:mm')
+    public getStringTime(): string {
+        return this.parsedTime.format('DD.MM.YY HH:mm');
     }
 
     private parseTime () {
@@ -50,28 +50,28 @@ class Time {
             if (match[1] === 'a' || match[1] === 'an') {
                 duration = 1;
             } else {
-                duration = parseInt(match[1]);
+                duration = parseInt(match[1], 10);
             }
             units = match[2];
-            if (units[units.length-1] !== 's') {
-                units += 's'
+            if (units[units.length - 1] !== 's') {
+                units += 's';
             }
         } else if (this.rawTime !== 'Yesterday') {
             this.logError();
         }
         if (!this.isUnitTypeCorrect(units)) {
-            this.logError()
+            this.logError();
         } else  {
             this.parsedTime =  moment().subtract(duration, units);
         }
     }
 
-    private isUnitTypeCorrect (unit : string) : unit is Base {
-        return this.possibleUnits.includes(unit)
+    private isUnitTypeCorrect (unit: string): unit is Base {
+        return this.possibleUnits.includes(unit);
     }
 
     private logError() {
-        throw new Error(`problems with parsing time from ${this.rawTime}`)
+        throw new Error(`problems with parsing time from ${this.rawTime}`);
     }
 }
 

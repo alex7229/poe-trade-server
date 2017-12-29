@@ -1,7 +1,7 @@
 // requests to http://poe.ninja/stats
 
 import { Request } from '../Request';
-import { JsonValidator } from '../../Helpers/JsonValidator';
+import { JsonValidator } from '../../validators/JsonValidator';
 
 export class LatestIdRequest extends Request {
 

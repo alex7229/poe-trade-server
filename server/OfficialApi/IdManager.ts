@@ -1,5 +1,5 @@
 import {Request} from '../Requests/Request'
-import {JsonValidator} from '../Helpers/JsonValidator'
+import {JsonValidator} from '../validators/JsonValidator'
 
 interface ApiData {
     url : string,

@@ -1,5 +1,5 @@
-import {Tag, AttrFinder, TagData, Attribute} from '../Helpers/TagParser';
-import {Time} from "../Helpers/Time"
+import {Tag, AttrFinder, TagData, Attribute} from './TagParser';
+import {Time} from "../helpers/Time"
 import {Moment} from "moment";
 
 interface Item {
