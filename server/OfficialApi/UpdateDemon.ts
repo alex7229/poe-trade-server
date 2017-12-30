@@ -1,7 +1,7 @@
-import { IdManager } from './IdManager';
 import { ApiValidator } from './ApiValidator';
-import { ApiRequest } from './ApiRequest';
-// import { Response } from '../Requests/Request';
+import { StashApiRequest } from '../requests/StashApiRequest';
+import { RequestInterface } from '../types';
+import { LatestIdRequest } from '../requests/PoeNinja/LatestIdRequest';
 
 /*interface ApiDescription {
     time: string;
@@ -14,21 +14,21 @@ export class UpdateDemon {
     private currentId: string;
     private readonly officialApiDelay: number = 50;
     private readonly thirdPartyApiDelay: number = 3000;
-    // private officialApiSavePath: string = `D:\\\\poe_api_temp_data\\official_api\\`;
 
     async officialApiUpdate (): Promise<void> {
         if (!this.currentId) {
-            const idManager = new IdManager();
+            const latestIdRequest = new LatestIdRequest();
             try {
-                this.currentId = await idManager.getLatestApiIdAvailable();
+                this.currentId = await latestIdRequest.getLatestApiId();
             } catch (err) {
                 this.retryUpdate(this.thirdPartyApiDelay);
                 return;
             }
         }
-        let response: Response;
+        let response: RequestInterface.Response;
         try {
-            response = await ApiRequest.fetch(this.currentId);
+            const stashRequest = new StashApiRequest(this.currentId);
+            response = await stashRequest.fetchStashes();
         } catch (err) {
             this.retryUpdate(this.officialApiDelay);
             return;

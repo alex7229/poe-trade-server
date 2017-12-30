@@ -1,5 +1,4 @@
 import * as express from 'express';
-import { Db } from 'mongodb';
 import { RequestResponse } from 'request';
 
 export namespace Server {
@@ -97,16 +96,162 @@ export namespace PoeNinjaInterface {
 }
 
 export namespace Database {
-    export interface ConnectionInfo {
-        success: boolean;
-        db: Db;
-        error ?: Error;
+    export interface CrudResult {
+        error?: Error;
+        data?: {}[];
+    }
+}
+
+export namespace OfficialApi {
+
+    export interface ItemType {
+        accessories?: string[];
     }
 
-    export interface CrudResult {
-        success: boolean;
-        error ?: Error;
-        data ?: {}[];
+    /** For some stupid reason it can be either item rarity or item type */
+    export enum ItemRarity {
+        normal = 0,
+        magic,
+        rare,
+        unique,
+        gem,
+        'currency',
+        'divination card',
+        'quest item',
+        prophecy,
+        relic
+    }
+
+    export enum ItemPropertyValueType {
+        /** physical value */
+        'white' = 0,
+        /** blue is used for modified values. Whatever that means */
+        'blue' = 1,
+        /** where are 2 and 3? */
+        'fire' = 4,
+        'cold' = 5,
+        'lightning' = 6,
+        'chaos' = 7
+    }
+
+    /** can be either property or requirement */
+    export interface ItemProperty {
+        /** for example: 'aura, spell, aoe', 'cast time' */
+        name: string;
+        /** number is value, and then type (it's number too) */
+        values: [number, ItemPropertyValueType];
+        /** wtf? */
+        displayMode: number;
+        /** no clue. */
+        type?: number;
+        /** experience for gems? */
+        progress?: number;
+    }
+
+    export interface Socket {
+        /** number for linked group. Used for calculation of item's links */
+        group: number;
+        /** Socket color: Green, White, Red, Blue, Abyss (though it's not a color but type) */
+        sColour: 'G' | 'W' | 'R' | 'B' | 'A';
+        /** attribute of socket. Stands for strength, dex, int, general and false for abyss */
+        attr: 'S' | 'D' | 'I' | 'G' | false;
+    }
+
+    // todo: check item interface. Some properties can be optional or some aren't stated atm. Check with array.every
+    export interface Item {
+        /** optional flag for new jewels */
+        abyssJewel?: boolean;
+        /** no clue. Check it later */
+        additionalProperties?: ItemProperty[];
+        /** something about divination cards */
+        artFilename?: string;
+        /**  can be 'maps' or { 'accessories': ['ring'] } */
+        category:   string | ItemType;
+        corrupted: boolean;
+        cosmeticMods?: string[];
+        /** user crafted mods via masters */
+        craftedMods?: string[];
+        /** main description */
+        descrText?: string;
+        /** item is duplicated via mirror or randomly from chest */
+        duplicated?: boolean;
+        /** labyrinth enchantments */
+        enchantMods?: string[];
+        /** mods 'under' the line */
+        explicitMods?: string[];
+        /** ? */
+        flavourText?: string[];
+        /** item rarity.  */
+        frameType: ItemRarity;
+        /** slot height */
+        h: number;
+        /** url for icon image */
+        icon: string;
+        /** unique item id which wouldn't change after using currency on the item */
+        id: string;
+        identified: boolean;
+        /** item level */
+        ilvl: number;
+        /** mods 'above' the line */
+        implicitMods?: string[];
+        /** 'Stash25' or 'Stash3' */
+        inventoryId: string;
+        isRelic?: boolean;
+        /** standard, hardcore, abyss etc */
+        league: string;
+        /** wtf? */
+        lockedToCharacter: boolean;
+        /** stack size. Mostly irrelevant */
+        maxStackSize?: number;
+        /** either regular name for a unique item or weird like '<<set:MS>><<set:M>><<set:S>>Armageddon Skewer' */
+        name: string;
+        nextLevelRequirements?: ItemProperty[];
+        /** can be price or regular note. Mb optional */
+        note: string;
+        /** specify armour, evasion,etc */
+        properties: ItemProperty[];
+        prophecyDiffText?: string;
+        prophecyText?: string;
+        /** level, dex, str etc */
+        requirements: ItemProperty[];
+        /** mostly irrelevant second description */
+        secDescrText?: string;
+        /** irrelevant gems inside sockets. It's like recursion, because gem is an item too in general */
+        socketedItems?: object[];
+        sockets?: Socket[];
+        stackSize?: number;
+        /** gem support? */
+        support?: boolean;
+        talismanTier?: number;
+        /** item base type, mixed with affix name for magic/rare items */
+        typeLine: string;
+        /** mods for flasks */
+        utilityMods?: string[];
+        /** wtf? How an item can be verified? By whom? */
+        verified: boolean;
+        /** slow width */
+        w: number;
+        /** horizontal item position in the stash */
+        x: number;
+        /** vertical item position in the stash */
+        y: number;
+    }
+
+    export interface Stash {
+        accountName: string;
+        id: string;
+        items: Item[];
+        lastCharacterName: string;
+        public: boolean;
+        /** stash - name of stash defined by user */
+        stash: string;
+        /** stashType can be: 'Premium stash', 'Map stash', etc */
+        stashType: string;
+    }
+
+    export interface GeneralResponse {
+        next_change_id: string;
+        stashes: Stash[];
     }
 }
 

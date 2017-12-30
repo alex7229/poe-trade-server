@@ -1,4 +1,4 @@
-import { CurrencyRequest } from '../Requests/PoeNinja/CurrencyRequest';
+import { CurrencyRequest } from '../requests/PoeNinja/CurrencyRequest';
 import { DatabaseCurrency } from '../databasesApi/CurrencyDatabase';
 import * as moment from 'moment';
 import { Currency } from '../types';

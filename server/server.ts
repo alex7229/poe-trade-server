@@ -5,17 +5,27 @@ let demon = new UpdateDemon();
 demon.officialApiUpdate();
 */
 
+import { ModifiersDatabase } from './databasesApi/ModifiersDatabase';
+
+let db = new ModifiersDatabase();
+db.addModifiers([{
+    type: 'explicit',
+    name: 'only rare mobs can kill you'
+}, {
+    type: 'implicit',
+    name: '#% increased max life'
+}, {
+    type: 'implicit',
+    name: '# to life regen'
+}]);
+
+/*
 import { CurrencyUpdater } from './Updaters/CurrencyUpdater';
 import { Server } from './types';
 import * as compression from 'compression';
 import { CurrencyRouter } from './routers/CurrencyRouter';
 import { ModifiersRouter } from './routers/ModifiersRouter';
 import { OfficialApiRouter } from './routers/OfficialApiRouter';
-/*
-import { ModifiersRequest } from './Requests/PoeTrade/ModifiersRequest';
-
-let request = new ModifiersRequest();
-request.getModifiers();*/
 
 CurrencyUpdater.run();
 
@@ -39,3 +49,4 @@ app.post('/addFilter', (req: Server.AddFilterRequest, res: Server.ServerResponse
 });
 
 app.listen(3001);
+*/

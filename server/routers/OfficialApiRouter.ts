@@ -1,6 +1,6 @@
 import { Server } from '../types';
 import { RequestParamHandler } from 'express';
-import { LatestIdRequest } from '../Requests/PoeNinja/LatestIdRequest';
+import { LatestIdRequest } from '../requests/PoeNinja/LatestIdRequest';
 
 const express = require('express');
 const OfficialApiRouter = express.Router();

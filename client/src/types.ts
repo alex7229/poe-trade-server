@@ -8,7 +8,6 @@ export namespace Currency {
 export namespace Modifiers {
     export interface Modifier {
         name: string;
-        active: boolean;
         type: string;
     }
 }

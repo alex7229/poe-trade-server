@@ -3,85 +3,84 @@ import { Collection, Db } from 'mongodb';
 import * as assert from 'assert';
 import { Database as DatabaseInterface } from '../types';
 import CrudResult = DatabaseInterface.CrudResult;
-import ConnectionInfo = DatabaseInterface.ConnectionInfo;
 
 // "C:\Program Files\MongoDB\Server\3.4\bin\mongod.exe" --dbpath  D:\OneDrive\mongoData - starting mongodb
 
 const MongoClient = mongodb.MongoClient;
 
+// todo: very important. To make sure all db methods don't throw errors. They should only update this.result.error
+// those methods would be used without try catch outside this class
+
 export class Database {
 
     private url: string = 'mongodb://localhost:27017/poe_server_test';
+    private result: CrudResult;
+    private internalDb: Db;
+    private collectionName: string;
 
-    protected async read(collectionName: string, sortObject: object = {},  limit: void | number): Promise<CrudResult> {
-        // sortObject example  {'time.timeInMs': -1} -> will sort time.timeInMs field in descending order (later first)
-        let result: CrudResult = {
-            success: true
-        };
-        let connection: ConnectionInfo;
-        try {
-            connection = await this.connect();
-        } catch (err) {
-            result.error = err;
-            return result;
-        }
-        let collection: Collection = connection.db.collection(collectionName);
-        let readResult: CrudResult;
-        try {
-            readResult = await this.internalReadMany(collection, sortObject, limit);
-        } catch (err) {
-            result.error = err;
-            result.success = false;
-            return result;
-        }
-        this.close(connection.db);
-        return readResult;
+    constructor(collectionName: string) {
+        this.collectionName = collectionName;
     }
 
-    protected async write(collectionName: string, data: {}[]): Promise<CrudResult> {
-        let result: CrudResult = {
-            success: true
-        };
-        let connection: ConnectionInfo;
+    protected getResult(): CrudResult {
+        return this.result;
+    }
+
+    protected async read(queryObject: object = {}, sortObject: object = {},  limit: undefined | number): Promise<void> {
+        // sortObject example  {'time.timeInMs': -1} -> will sort time.timeInMs field in descending order (later first)
+        this.clearResult();
         try {
-            connection = await this.connect();
+            this.internalDb = await this.connect();
         } catch (err) {
-            result.error = err;
-            return result;
+            this.result.error = err;
+            return;
         }
-        let collection: Collection = connection.db.collection(collectionName);
+        let collection: Collection = this.internalDb.collection(this.collectionName);
         try {
-            await this.internalWriteMany(collection, data);
+            this.result = await this.internalReadMany(collection, queryObject, sortObject, limit);
         } catch (err) {
-            result.error = err;
-            result.success = false;
-            return result;
+            this.result.error = err;
+            return;
         }
-        this.close(connection.db);
-        return result;
+        this.closeConnection();
+        return;
+    }
+
+    protected async write(data: object[]): Promise<void> {
+        this.clearResult();
+        try {
+            this.internalDb = await this.connect();
+        } catch (err) {
+            this.result.error = err;
+            return;
+        }
+        let collection: Collection = this.internalDb.collection(this.collectionName);
+        try {
+            this.result = await this.internalWriteMany(collection, data);
+        } catch (err) {
+            this.result.error = err;
+            return;
+        }
+        this.closeConnection();
+        return;
     }
 
     private internalReadMany
     (
         collection: Collection,
-        sortObject: object = {},
-        limit: void | number
+        queryObject: object,
+        sortObject: object,
+        limit: undefined | number
     ): Promise<CrudResult> {
         return new Promise((resolve, reject) => {
             collection
-                .find({}, limit ?  {limit} : undefined)
+                .find(queryObject, limit ?  {limit} : undefined)
                 .sort(sortObject)
                 .toArray((err, docs) => {
-                    let result: CrudResult = {
-                        success: true
-                    };
                     if (err !== null) {
-                        result.success = false;
-                        result.error = err;
-                        return reject(err);
+                        return reject({err});
                     }
-                    result.data = docs;
-                    return resolve(result);
+                    return resolve({data: docs});
                 });
         });
     }
@@ -89,41 +88,36 @@ export class Database {
     private internalWriteMany (collection: Collection, data: {}[]): Promise<CrudResult> {
         return new Promise((resolve, reject) => {
             collection.insertMany(data, (err: Error, writeResult) => {
-                let result: CrudResult = {
-                    success: true
-                };
                 try {
                     assert.equal(err, null);
                     assert.equal(data.length, writeResult.result.n);
                     assert.equal(data.length, writeResult.ops.length);
                 } catch (err) {
-                    result.success = false;
-                    result.error = err;
-                    return reject(result);
+                    return reject({err});
                 }
-                return resolve(result);
+                return resolve({});
             });
         });
     }
 
-    private connect (): Promise<ConnectionInfo> {
+    private clearResult(): void {
+        this.result = {};
+    }
+
+    private connect (): Promise<Db> {
         return new Promise ((resolve, reject) => {
             MongoClient.connect(this.url, (err: Error, db: Db) => {
-                let result: ConnectionInfo = {
-                    success: true,
-                    db
-                };
                 if (err !== null) {
-                    result.success = false;
-                    result.error = err;
-                    return reject(result);
+                    return reject(err);
                 }
-                resolve (result);
+                return resolve (db);
             });
         });
     }
 
-    private close(db: Db): void {
-        db.close();
+    private closeConnection(): void {
+        if (this.internalDb) {
+            this.internalDb.close();
+        }
     }
 }
