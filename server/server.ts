@@ -5,20 +5,6 @@ let demon = new UpdateDemon();
 demon.officialApiUpdate();
 */
 
-import { ModifiersDatabase } from './databasesApi/ModifiersDatabase';
-
-let db = new ModifiersDatabase();
-db.addModifiers([{
-    type: 'explicit',
-    name: 'only rare mobs can kill you'
-}, {
-    type: 'implicit',
-    name: '#% increased max life'
-}, {
-    type: 'implicit',
-    name: '# to life regen'
-}]);
-
 /*
 import { CurrencyUpdater } from './Updaters/CurrencyUpdater';
 import { Server } from './types';
@@ -50,3 +36,61 @@ app.post('/addFilter', (req: Server.AddFilterRequest, res: Server.ServerResponse
 
 app.listen(3001);
 */
+
+import { OfficialApiResponseValidator as Validator } from './validators/OfficialApiResponseValidator';
+import { LatestIdRequest } from './requests/PoeNinja/LatestIdRequest';
+import { StashApiRequest } from './requests/StashApiRequest';
+import { JsonValidator } from './validators/JsonValidator';
+import { OfficialApi } from './types';
+import Item = OfficialApi.Item;
+
+let idRequest = new LatestIdRequest();
+idRequest.getLatestApiId()
+    .then((id) => {
+        let stashRequest = new StashApiRequest(id);
+        stashRequest.fetchStashes()
+            .then((response) => {
+                let jsonString = response.body;
+                let isValid = JsonValidator.validate(jsonString);
+                if (isValid) {
+                    const stashesResponse = JSON.parse(jsonString);
+                    if (Validator.validate(stashesResponse)) {
+                        const items: Item[] = stashesResponse.stashes.reduce((current, total) => {
+                            return total.items.concat(current);
+                        }, []);
+                        const propObj = {
+                                category: '',
+                                frameType: '',
+                                h: '',
+                                icon: '',
+                                id: '',
+                                identified: '',
+                                ilvl: '',
+                                inventoryId: '',
+                                league: '',
+                                name: '',
+                                typeLine: '',
+                                verified: '',
+                                note: '',
+                                w: '',
+                                x: '',
+                                y: ''
+                            };
+                        const properties: string[] = [];
+                        for (let prop in propObj) {
+                            if (propObj.hasOwnProperty(prop)) {
+                                properties.push(prop);
+                            }
+                        }
+                        items.forEach((item) => {
+                            properties.forEach(property => {
+                                if (!item.hasOwnProperty(property)) {
+                                    debugger;
+                                }
+                            });
+                        });
+                    }
+                    debugger;
+                }
+            });
+    });

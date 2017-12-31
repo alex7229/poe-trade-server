@@ -167,7 +167,7 @@ export namespace OfficialApi {
         artFilename?: string;
         /**  can be 'maps' or { 'accessories': ['ring'] } */
         category:   string | ItemType;
-        corrupted: boolean;
+        corrupted?: boolean;
         cosmeticMods?: string[];
         /** user crafted mods via masters */
         craftedMods?: string[];
@@ -175,6 +175,8 @@ export namespace OfficialApi {
         descrText?: string;
         /** item is duplicated via mirror or randomly from chest */
         duplicated?: boolean;
+        /** is item elder */
+        elder?: boolean;
         /** labyrinth enchantments */
         enchantMods?: string[];
         /** mods 'under' the line */
@@ -200,22 +202,24 @@ export namespace OfficialApi {
         /** standard, hardcore, abyss etc */
         league: string;
         /** wtf? */
-        lockedToCharacter: boolean;
+        lockedToCharacter?: boolean;
         /** stack size. Mostly irrelevant */
         maxStackSize?: number;
         /** either regular name for a unique item or weird like '<<set:MS>><<set:M>><<set:S>>Armageddon Skewer' */
         name: string;
         nextLevelRequirements?: ItemProperty[];
-        /** can be price or regular note. Mb optional */
-        note: string;
+        /** can be price or regular note. */
+        note?: string;
         /** specify armour, evasion,etc */
-        properties: ItemProperty[];
+        properties?: ItemProperty[];
         prophecyDiffText?: string;
         prophecyText?: string;
         /** level, dex, str etc */
-        requirements: ItemProperty[];
+        requirements?: ItemProperty[];
         /** mostly irrelevant second description */
         secDescrText?: string;
+        /** is item dropped in shaper map */
+        shaper: boolean;
         /** irrelevant gems inside sockets. It's like recursion, because gem is an item too in general */
         socketedItems?: object[];
         sockets?: Socket[];
@@ -238,20 +242,29 @@ export namespace OfficialApi {
     }
 
     export interface Stash {
-        accountName: string;
         id: string;
         items: Item[];
-        lastCharacterName: string;
         public: boolean;
-        /** stash - name of stash defined by user */
-        stash: string;
         /** stashType can be: 'Premium stash', 'Map stash', etc */
         stashType: string;
     }
 
+    export interface FullStash extends Stash {
+        accountName: string;
+        lastCharacterName: string;
+        /** name of stash defined by user */
+        stash: string;
+    }
+
+    export interface EmptyStash extends Stash {
+        accountName: null;
+        lastCharacterName: null;
+        stash: null;
+    }
+
     export interface GeneralResponse {
         next_change_id: string;
-        stashes: Stash[];
+        stashes: (EmptyStash | FullStash)[];
     }
 }
 

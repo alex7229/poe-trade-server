@@ -8,6 +8,7 @@ export class OfficialApiResponseValidator {
         const booleanType = {type: 'boolean'};
         const stringType = {type: 'string'};
         const numberType = {type: 'number'};
+        const nullType = {type: 'null'};
 
         const stringArrayType = {
             type: 'array',
@@ -24,7 +25,13 @@ export class OfficialApiResponseValidator {
                     name: stringType,
                     values: {
                         type: 'array',
-                        items: [numberType, numberType]
+                        items: {
+                            type: 'array',
+                            items: [
+                                {oneOf: [stringType, numberType]},
+                                numberType
+                            ]
+                        },
                     },
                     displayMode: numberType,
                     type: numberType,
@@ -40,7 +47,10 @@ export class OfficialApiResponseValidator {
                 {
                     type: 'object',
                     properties: {
-                        accessories: stringArrayType
+                        accessories: stringArrayType,
+                        armour: stringArrayType,
+                        jewels: stringArrayType,
+                        weapons: stringArrayType,
                     },
                     additionalProperties: false
                 }
@@ -83,6 +93,7 @@ export class OfficialApiResponseValidator {
                 craftedMods: stringArrayType,
                 descrText: stringType,
                 duplicated: booleanType,
+                elder: booleanType,
                 enchantMods: stringArrayType,
                 explicitMods: stringArrayType,
                 flavourText: stringArrayType,
@@ -106,11 +117,12 @@ export class OfficialApiResponseValidator {
                 prophecyText: stringType,
                 requirements: itemPropertiesSchema,
                 secDescrText: stringType,
+                shaper: booleanType,
                 socketedItems: {type: 'array'},
                 sockets: socketsSchema,
                 stackSize: numberType,
                 support: booleanType,
-                talismanTier: booleanType,
+                talismanTier: numberType,
                 typeLine: stringType,
                 utilityMods: stringArrayType,
                 verified: booleanType,
@@ -120,24 +132,28 @@ export class OfficialApiResponseValidator {
             },
             additionalProperties: false,
             patternProperties: {
-                '^[\\s]*RaceReward$': {
-                    type: 'boolean'
-                }
-            },
+                '^[\\s]*RaceReward$': booleanType
+            }
         };
 
         const stashSchema = {
             type: 'object',
             properties: {
-                accountName: stringType,
+                accountName: {
+                    oneOf: [stringType, nullType]
+                },
                 id: stringType,
                 items: {
                     type: 'array',
                     items: itemSchema
                 },
-                lastCharacterName: stringType,
+                lastCharacterName: {
+                    oneOf: [stringType, nullType]
+                },
                 public: booleanType,
-                stash: stringType,
+                stash: {
+                    oneOf: [stringType, nullType]
+                },
                 stashType: stringType
             },
             additionalProperties: false
