@@ -3,7 +3,6 @@ import { Currency } from '../types';
 import * as Ajv from 'ajv';
 
 export class CurrencyDatabase extends Database {
-    // divide this class in two - currency manager and poe.ninja.manager
 
     constructor() {
         super('currency');

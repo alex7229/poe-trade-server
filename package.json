@@ -14,10 +14,10 @@
     "compression": "^1.7.1",
     "express": "^4.15.4",
     "moment": "^2.18.1",
-    "mongodb": "^2.2.31",
+    "mongodb": "^2.2.33",
     "request": "^2.83.0"
   },
   "scripts": {
-    "debug": "nodemon --watch server/ --inspect-brk server/server.js"
+    "debug": "nodemon --watch 'server/*.js'  --inspect-brk server/server.js"
   }
 }

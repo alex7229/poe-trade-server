@@ -1,15 +1,15 @@
 import { Database } from './Database';
-import { Modifiers } from '../../client/src/types';
+import { Modifiers, OfficialApi } from '../types';
 import Modifier = Modifiers.Modifier;
+import ModifiersSearchOptions = Modifiers.ModifiersSearchOptions;
+import Stash = OfficialApi.Stash;
 
 // todo: implement next
 // 1) when parsing all stashes, find all possible unique modifiers
-// ...(! for non-unique items) (all implicit, explicit, crafted)
-// 2) having this big list of modifiers add them to modifiers collection via the next command:
-// ...probably should try regular write method of database (but one should be careful to check if it doesn't throw an
+// ...() (all implicit, explicit, crafted, enchanted, utils)
+// 2) having this big list of modifiers, add them to modifiers collection via the
+// ... regular write method of database (but one should be careful to check if it doesn't throw an
 // ... error if the first modifier is already set in the collection). It should add only those which are not yet set.
-// ... The other way around is to fetch all possible modifiers from db and check if there are any new ones in the list.
-// ... and write only them.
 // 3) While creating list of all modifiers, one should create different groups of items on which those modifiers
 // ... are applied. For example, 'helmet': ['mod 1, 'mod 2'], 'boots': ['mod 1 for boots', 'next mod']
 // 4) For every item type (helmet, boots, etc) run next update query (this one is for helmet)
@@ -31,8 +31,8 @@ export class ModifiersDatabase extends Database {
         super('modifiers');
     }
 
-    public async addModifiers(modifiers: Modifier[]) {
-        await this.write(modifiers);
+    public async writeModifiers(modifiers: Modifier[]) {
+        await this.write(modifiers, {ordered: false});
         const result = this.getResult();
         if (result.error) {
             // check the error (it can either be duplicate insert  or some other error)
@@ -40,25 +40,55 @@ export class ModifiersDatabase extends Database {
         }
     }
 
-    public async fetchModifier(name: string, type: string): Promise<object> {
-        const result = await this.fetchModifiers({name, type}, {}, 1);
-        return result[0];
-    }
-
-    public async fetchModifiersByType (type: string): Promise<object[]> {
-        return await this.fetchModifiers({type}, {name: 1}, undefined);
+    public async tempUpdate(stashes: Stash[], changeId: string) {
+        for (const stash of stashes) {
+            let abyss = 0;
+            let other = 0;
+            stash.items.forEach(item => {
+                if (item.league === 'Abyss') {
+                    abyss++;
+                } else {
+                    other++;
+                }
+            });
+            try {
+                await this.upsert({
+                    '_id': stash.id
+                }, {
+                    '_id': stash.id,
+                    abyss,
+                    other
+                });
+            } catch (err) {
+                debugger;
+            }
+        }
+        return await this.upsert(
+            {'latest_id': {'$exists': true}},
+            {'latest_id': changeId}
+        );
     }
 
     public async fetchAllModifiers(): Promise<object[]> {
-        return await this.fetchModifiers({}, {name: 1}, undefined);
+        return await this.fetchModifiers({}, {name: 1});
     }
 
-    private async fetchModifiers(
-        queryObject: object,
-        sortObject: object,
-        limit: number | undefined
+    public async fetchModifiers (
+        modifiersData: ModifiersSearchOptions = {},
+        sortObject: object = {name: 1},
+        limit: number = 0
     ): Promise<object[]> {
-        await this.read(queryObject, sortObject, limit);
+        const query = Object.create(null);
+        if (modifiersData.names) {
+            query.name = {$in: modifiersData.names};
+        }
+        if (modifiersData.types) {
+            query.type = {$in: modifiersData.types};
+        }
+        if (modifiersData.used_in) {
+            query.used_in = {$in: modifiersData.used_in};
+        }
+        await this.read(query, sortObject, limit);
         const result = this.getResult();
         if (result.error || !result.data) {
             throw new Error(`cannot find modifiers`);

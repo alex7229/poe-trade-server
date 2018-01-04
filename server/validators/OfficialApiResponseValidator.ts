@@ -41,19 +41,66 @@ export class OfficialApiResponseValidator {
             }
         };
 
+        const stringPattern = (names: string[]): object => {
+            const pattern: string = names
+                .map((name) => {
+                    return `${name}`;
+                })
+                .join('|');
+            return {
+                type: 'string',
+                pattern: `(${pattern})`
+            };
+        };
+
+        const categoryArray = (names: string[]): object => {
+            return {
+                type: 'array',
+                items: [stringPattern(names)]
+            };
+        };
+
+        const weapons = categoryArray([
+            'twosword',
+            'bow',
+            'dagger',
+            'staff',
+            'claw',
+            'onesword',
+            'wand',
+            'oneaxe',
+            'twoaxe',
+            'sceptre',
+            'onemace',
+            'twomace',
+            'rod'
+        ]);
+
+        const otherCategories = stringPattern([
+            'maps',
+            'currency',
+            'jewels',
+            'gems',
+            'cards',
+            'flasks',
+            'leaguestones'
+        ]);
+
         const categorySchema = {
             oneOf: [
-                stringType,
                 {
                     type: 'object',
                     properties: {
-                        accessories: stringArrayType,
-                        armour: stringArrayType,
-                        jewels: stringArrayType,
-                        weapons: stringArrayType,
+                        accessories: categoryArray(['belt', 'amulet', 'ring']),
+                        armour: categoryArray(['quiver', 'helmet', 'boots', 'gloves', 'chest', 'shield']),
+                        jewels: categoryArray(['abyss']),
+                        weapons,
+                        // todo: add on wiki currency - piece is missing. Mb other currencies are missing too
+                        currency: categoryArray(['piece'])
                     },
                     additionalProperties: false
-                }
+                },
+                otherCategories,
             ]
         };
 
@@ -106,7 +153,12 @@ export class OfficialApiResponseValidator {
                 implicitMods: stringArrayType,
                 inventoryId: stringType,
                 isRelic: booleanType,
-                league: stringType,
+                /**
+                 * it can be false for some reason
+                 */
+                league: {
+                    oneOf: [stringType, booleanType]
+                },
                 lockedToCharacter: booleanType,
                 maxStackSize: numberType,
                 name: stringType,
@@ -128,11 +180,15 @@ export class OfficialApiResponseValidator {
                 verified: booleanType,
                 w: numberType,
                 x: numberType,
-                y: numberType
+                y: numberType,
+                thRaceReward: booleanType,
+                cisRaceReward: booleanType,
+                seaRaceReward: booleanType
+                // add this stuff to typescript and to wiki
             },
             additionalProperties: false,
             patternProperties: {
-                '^[\\s]*RaceReward$': booleanType
+                '^[\\s]*RaceReward': booleanType
             }
         };
 

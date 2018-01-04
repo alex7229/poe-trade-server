@@ -105,7 +105,10 @@ export namespace Database {
 export namespace OfficialApi {
 
     export interface ItemType {
-        accessories?: string[];
+        accessories?: [string];
+        armour?: [string];
+        weapons?: [string];
+        jewels?: [string];
     }
 
     /** For some stupid reason it can be either item rarity or item type */
@@ -274,5 +277,19 @@ export namespace RequestInterface {
         success: boolean;
         error?: Error;
         body: string;
+    }
+}
+
+export namespace Modifiers {
+    export interface Modifier {
+        name: string;
+        type: string;
+        used_in: string[];
+    }
+
+    export interface ModifiersSearchOptions {
+        names?: string[];
+        types?: string[];
+        used_in?: string[];
     }
 }

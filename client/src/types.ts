@@ -4,10 +4,3 @@ export namespace Currency {
         value: number;
     }
 }
-
-export namespace Modifiers {
-    export interface Modifier {
-        name: string;
-        type: string;
-    }
-}

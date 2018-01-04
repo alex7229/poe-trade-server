@@ -1,10 +1,9 @@
 import * as mongodb from 'mongodb';
 import { Collection, Db } from 'mongodb';
-import * as assert from 'assert';
 import { Database as DatabaseInterface } from '../types';
 import CrudResult = DatabaseInterface.CrudResult;
 
-// "C:\Program Files\MongoDB\Server\3.4\bin\mongod.exe" --dbpath  D:\OneDrive\mongoData - starting mongodb
+// "C:\Program Files\MongoDB\Server\3.4\bin\mongod.exe" --dbpath  C:\mongoData - starting mongodb
 
 const MongoClient = mongodb.MongoClient;
 
@@ -26,68 +25,76 @@ export class Database {
         return this.result;
     }
 
-    protected async read(queryObject: object = {}, sortObject: object = {},  limit: undefined | number): Promise<void> {
-        // sortObject example  {'time.timeInMs': -1} -> will sort time.timeInMs field in descending order (later first)
-        this.clearResult();
+    protected async read(queryObject: object = {}, sortObject: object = {},  limit: number = 0): Promise<void> {
+        this.result = {};
         try {
-            this.internalDb = await this.connect();
+            this.internalDb = await MongoClient.connect(this.url);
         } catch (err) {
             this.result.error = err;
             return;
         }
         let collection: Collection = this.internalDb.collection(this.collectionName);
         try {
-            this.result = await this.internalReadMany(collection, queryObject, sortObject, limit);
-        } catch (err) {
-            this.result.error = err;
-            return;
-        }
-        this.closeConnection();
-        return;
-    }
-
-    protected async write(data: object[]): Promise<void> {
-        this.clearResult();
-        try {
-            this.internalDb = await this.connect();
-        } catch (err) {
-            this.result.error = err;
-            return;
-        }
-        let collection: Collection = this.internalDb.collection(this.collectionName);
-        try {
-            this.result = await this.internalWriteMany(collection, data);
-        } catch (err) {
-            this.result.error = err;
-            return;
-        }
-        this.closeConnection();
-        return;
-    }
-
-    private internalReadMany
-    (
-        collection: Collection,
-        queryObject: object,
-        sortObject: object,
-        limit: undefined | number
-    ): Promise<CrudResult> {
-        return new Promise((resolve, reject) => {
-            collection
-                .find(queryObject, limit ?  {limit} : undefined)
+            this.result.data = await collection
+                .find(queryObject)
                 .sort(sortObject)
-                .toArray((err, docs) => {
-                    if (err !== null) {
-                        return reject({err});
-                    }
-                    return resolve({data: docs});
-                });
-        });
+                .limit(limit)
+                .toArray();
+        } catch (err) {
+            this.result.error = err;
+        }
+        return await this.internalDb.close();
     }
 
-    private internalWriteMany (collection: Collection, data: {}[]): Promise<CrudResult> {
+    protected async write(data: object[], options: object = {}): Promise<void> {
+        this.result = {};
+        try {
+            this.internalDb = await MongoClient.connect(this.url);
+        } catch (err) {
+            this.result.error = err;
+            return;
+        }
+        let collection: Collection = this.internalDb.collection(this.collectionName);
+        try {
+            await collection.insertMany(data, options);
+        } catch (err) {
+            this.result.error = err;
+        }
+        return await this.internalDb.close();
+    }
+
+    protected async upsert(query: object, data: object): Promise<void> {
+        this.result = {};
+        try {
+            this.internalDb = await MongoClient.connect(this.url);
+        } catch (err) {
+            this.result.error = err;
+            return;
+        }
+        let collection: Collection = this.internalDb.collection(this.collectionName);
+        try {
+            await collection.updateOne(query, data, {upsert: true});
+        } catch (err) {
+            this.result.error = err;
+        }
+        return await this.internalDb.close();
+    }
+
+    /*protected async update(query: object, update: object): Promise<void> {
+        this.clearResult();
+        try {
+            this.internalDb = await this.connect();
+        } catch (err) {
+            this.result.error = err;
+            return;
+        }
+        let collection: Collection = this.internalDb.collection(this.collectionName);
+
+    }
+
+    private internalWriteMany (collection: Collection, data: object[], options: object = {}): Promise<CrudResult> {
         return new Promise((resolve, reject) => {
-            collection.insertMany(data, (err: Error, writeResult) => {
+            collection.insertMany(data, options, (err: Error, writeResult) => {
                 try {
                     assert.equal(err, null);
                     assert.equal(data.length, writeResult.result.n);
@@ -100,24 +107,7 @@ export class Database {
         });
     }
 
-    private clearResult(): void {
-        this.result = {};
-    }
-
-    private connect (): Promise<Db> {
-        return new Promise ((resolve, reject) => {
-            MongoClient.connect(this.url, (err: Error, db: Db) => {
-                if (err !== null) {
-                    return reject(err);
-                }
-                return resolve (db);
-            });
-        });
-    }
-
-    private closeConnection(): void {
-        if (this.internalDb) {
-            this.internalDb.close();
-        }
-    }
+    private async internalUpdateMany(collection: Collection, query: object, update: object): Promise<CrudResult> {
+        const result =  await collection.updateMany(query, update);
+    }*/
 }
