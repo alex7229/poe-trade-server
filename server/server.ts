@@ -39,7 +39,7 @@ app.listen(3001);
 */
 
 // fetcher
-import { OfficialApiResponseValidator as Validator } from './validators/OfficialApiResponseValidator';
+/*import { OfficialApiResponseValidator as Validator } from './validators/OfficialApiResponseValidator';
 // import { LatestIdRequest } from './requests/PoeNinja/LatestIdRequest';
 import { StashApiRequest } from './requests/StashApiRequest';
 // import { JsonValidator } from './validators/JsonValidator';
@@ -74,51 +74,11 @@ async function fetchResponsesContinuously (
     id: string
 ): Promise<GeneralResponse> {
     let res = await getResponse(id);
-    res.stashes.forEach((stash) => {
-        if (stash.accountName === 'tup1tsa') {
-            console.log('found mine account');
-        }
-        stash.items.forEach((item) => {
-            let totalMods = 0;
-            // if (item.implicitMods) {
-            //     totalMods += item.implicitMods.length;
-            // }
-            // if (item.explicitMods) {
-            //     totalMods += item.explicitMods.length;
-            // }
-            // if (item.craftedMods) {
-            //     totalMods += item.craftedMods.length;
-            // }
-            if (item.utilityMods) {
-                totalMods += item.utilityMods.length;
-            }
-            // if (item.enchantMods) {
-            //     totalMods += item.enchantMods.length;
-            // }
-            // const regExp = new RegExp('Mana Gained', 'i');
-            // const additionalMod = item.implicitMods && item.implicitMods[1] ? item.implicitMods[1] : undefined;
-            modsCount[totalMods] ++;
-            // if (
-            //     totalMods === 2
-            //     && additionalMod
-            //     && additionalMod.match(regExp) === null
-            //     && item.category !== 'leaguestones'
-            // ) {
-            //     console.log(item);
-            // }
-        });
-    });
-    const itemsProccessed = modsCount.reduce((total, current) => total + current, 0);
-    const message = modsCount.map((modNumber, index) => {
-        return `Items percentage with ${index} mods is ${modNumber / itemsProccessed * 100}%`;
-    }).join('\n');
-    console.log(message);
-    /*let db = new ModifiersDatabase();
-    db.tempUpdate(res.stashes, res.next_change_id);*/
+    console.log(JSON.stringify(res).length);
     return fetchResponsesContinuously(res.next_change_id);
 }
 
-fetchResponsesContinuously('128024191-133994962-125703711-144823900-135439502');
+fetchResponsesContinuously('128571206-134550501-126222320-145414677-136008522');*/
 
 // console.time('download');
 /*let idRequest = new LatestIdRequest();
@@ -198,7 +158,7 @@ idRequest.getLatestApiId()
 // other items are active (changing all the time)
 
 // indices sizes test
-/*import { IndicesSizeTestDatabase } from './databasesApi/IndicesSizeTestDatabase';
+import { IndicesSizeTestDatabase } from './databasesApi/IndicesSizeTestDatabase';
 
 interface Modifier {
     type: number;
@@ -210,14 +170,34 @@ interface Item {
     mods: Modifier[];
 }
 
-function getRandomMods(): Modifier[] {
+interface ModifierType {
+    _id: number;
+    types: number[];
+}
+
+function getRandomMods(isLife: boolean): Modifier[] {
     let mods: Modifier[] = [];
-    const modsCount = Math.floor(Math.random() * 12);
+    const modsCount = Math.floor(Math.random() * 7);
     for (let i = 0; i < modsCount; i++) {
         mods.push({
             type: Math.floor(Math.random() * 1000),
-            value: Math.floor(Math.random() * 100) + 20
+            value: Math.floor(Math.random() * 100)
         });
+    }
+    const lifeType = 217;
+    if (isLife && modsCount > 0) {
+        const lifeModIndex = Math.floor(Math.random() * modsCount);
+        const value = Math.round(Math.random() * 80);
+        mods[lifeModIndex] = {type: lifeType, value};
+    }
+    return mods;
+}
+
+function getRandomModTypes(): number[] {
+    let mods: number[] = [];
+    const modsCount = Math.floor(Math.random() * 7);
+    for (let i = 0; i < modsCount; i++) {
+        mods.push(Math.floor(Math.random() * 32));
     }
     return mods;
 }
@@ -225,25 +205,37 @@ function getRandomMods(): Modifier[] {
 function getRandomName(): string {
     const chars = 'qwertyuiopasdfghjklzxcvbnm';
     return Array(3).fill('').map(() => {
-        const index = Math.floor(Math.random() * 24);
+        const index = Math.floor(Math.random() * 26);
         return chars[index];
     }).join('');
 }
 
-let items: Item[] = [];
-
-for (let i = 0; i < 1000000; i++) {
-    items.push({
-        name: getRandomName(),
-        mods: getRandomMods()
-    });
+function getModifiers(count: number): ModifierType[] {
+    return Array(count)
+        .fill(0)
+        .map((item, index) => ({
+            _id: Math.floor(Math.random() * (10 ** 9)),
+            types: getRandomModTypes()}
+        ));
 }
 
-let db = new IndicesSizeTestDatabase();
-async function log() {
-    console.time('start');
-    await db.update(items);
-    console.timeEnd('start');
+async function save() {
+    for (let i = 0; i < 7; i++) {
+        let db = new IndicesSizeTestDatabase();
+        await db.update(getModifiers(1000 * 1000));
+        console.log(`${i} millions saved`);
+    }
+    /*console.time('start');
+    let db = new IndicesSizeTestDatabase();
+    await db.update(getModifiers(5000));
+    console.timeEnd('start');*/
 }
 
-log();*/
+let array = Array(1000000)
+    .fill(Math.random() * 1000);
+
+console.time('start');
+array.sort();
+console.timeEnd('start');
+
+// save();

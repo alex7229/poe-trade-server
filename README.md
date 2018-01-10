@@ -9,7 +9,8 @@ Current status:
 - backend: 
     - filters: not implemented
     - item saves to db: not implemented
-
+    
+In order to start mongo, run: "C:\Program Files\MongoDB\Server\3.6\bin\mongod.exe" --dbpath  C:\mongoData
 
 
 
@@ -89,8 +90,7 @@ Modifiers should be indexed as arrays. <br />
 Two letters values. It's easy to save categories contractions inside code. No point in making 'join'.<br />
 E.g.: ta - two handed axe, aj - abyss jewel (abyss jewel should be category, not boolean)
 <h6>Additional data: indexed</h6>
-Array of booleans string. E.g.: ['corrupted', 'duplicated'].<br />
-It could be done with parsed indexes and without arrays.
+It could be done with parsed indexes.
 <ul>
     <li>corrupted</li>
     <li>elder</li>
@@ -99,18 +99,13 @@ It could be done with parsed indexes and without arrays.
     <li>identified</li>
     <li>isRelic: not important but super rare, so it's easy to index</li>
 </ul>
-This data would be duplicated for sake of simplicity.<br /> 
-For example, item would have corrupted property in addition to indexed array with this property.<br />
 Other booleans, like 'support' would not be indexed.
 
 
 <h6>Sockets: indexed</h6>
-It would be number, that points to socket collection with different sockets schemas.<br />
-In order to query item by sockets:
-1) fetch all sockets schemas from sockets collection
-2) find indexes whick satisfy query
-3) use $in operator to find items (there would be a lot of different variations).
-If speed is too low, add more data to indices (e.g.: links number, sockets number, etc)
+Create array of sockets data.<br />
+[{totalSockets: number}, {white: number}, ... {totalLinks: number}, {greenLinks: number}...]
+Index as multikey
 
 
 <h6>Item properties: indexed</h6>

@@ -53,11 +53,6 @@ export namespace Filters {
         body: FilterParameter[];
     }
 
-    export interface Modifier {
-        type: string;
-        name: string;
-    }
-
 }
 
 export namespace PoeNinjaInterface {
@@ -92,13 +87,6 @@ export namespace PoeNinjaInterface {
     export interface Api {
         currencyDetails: CurrencyDetails[];
         lines: Lines[];
-    }
-}
-
-export namespace Database {
-    export interface CrudResult {
-        error?: Error;
-        data?: {}[];
     }
 }
 
