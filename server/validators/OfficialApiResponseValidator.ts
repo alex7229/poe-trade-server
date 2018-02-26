@@ -1,6 +1,8 @@
 import * as Ajv from 'ajv';
 import { OfficialApi } from '../types';
 import GeneralResponse = OfficialApi.GeneralResponse;
+import { categories } from '../categories';
+import * as _ from 'lodash';
 
 export class OfficialApiResponseValidator {
 
@@ -53,54 +55,29 @@ export class OfficialApiResponseValidator {
             };
         };
 
-        const categoryArray = (names: string[]): object => {
+        const categoryArray = (names?: string[]): object => {
+            if (!names) {
+                return {
+                    type: 'array'
+                };
+            }
             return {
                 type: 'array',
                 items: [stringPattern(names)]
             };
         };
 
-        const weapons = categoryArray([
-            'twosword',
-            'bow',
-            'dagger',
-            'staff',
-            'claw',
-            'onesword',
-            'wand',
-            'oneaxe',
-            'twoaxe',
-            'sceptre',
-            'onemace',
-            'twomace',
-            'rod'
-        ]);
-
-        const otherCategories = stringPattern([
-            'maps',
-            'currency',
-            'jewels',
-            'gems',
-            'cards',
-            'flasks',
-            'leaguestones'
-        ]);
+        const categoryProperties = _.mapValues(categories, ((subcategories) => {
+            return categoryArray(subcategories);
+        }));
 
         const categorySchema = {
             oneOf: [
                 {
                     type: 'object',
-                    properties: {
-                        accessories: categoryArray(['belt', 'amulet', 'ring']),
-                        armour: categoryArray(['quiver', 'helmet', 'boots', 'gloves', 'chest', 'shield']),
-                        jewels: categoryArray(['abyss']),
-                        weapons,
-                        // todo: add on wiki currency - piece is missing. Mb other currencies are missing too
-                        currency: categoryArray(['piece'])
-                    },
+                    properties: categoryProperties,
                     additionalProperties: false
-                },
-                otherCategories,
+                }
             ]
         };
 

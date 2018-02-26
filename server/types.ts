@@ -53,11 +53,6 @@ export namespace Filters {
         body: FilterParameter[];
     }
 
-    export interface Modifier {
-        type: string;
-        name: string;
-    }
-
 }
 
 export namespace PoeNinjaInterface {
@@ -92,13 +87,6 @@ export namespace PoeNinjaInterface {
     export interface Api {
         currencyDetails: CurrencyDetails[];
         lines: Lines[];
-    }
-}
-
-export namespace Database {
-    export interface CrudResult {
-        error?: Error;
-        data?: {}[];
     }
 }
 
@@ -209,6 +197,7 @@ export namespace OfficialApi {
         /** stack size. Mostly irrelevant */
         maxStackSize?: number;
         /** either regular name for a unique item or weird like '<<set:MS>><<set:M>><<set:S>>Armageddon Skewer' */
+        // also name can be empty string ''
         name: string;
         nextLevelRequirements?: ItemProperty[];
         /** can be price or regular note. */
@@ -281,15 +270,30 @@ export namespace RequestInterface {
 }
 
 export namespace Modifiers {
-    export interface Modifier {
-        name: string;
-        type: string;
-        used_in: string[];
+    export enum ModifierType {
+        explicitMods = 0,
+        implicitMods,
+        craftedMods,
+        utilityMods,
+        enchantMods,
+        cosmeticMods
     }
 
-    export interface ModifiersSearchOptions {
-        names?: string[];
-        types?: string[];
-        used_in?: string[];
+    export interface ModifierValue {
+        values: number[] | null;
+        average: number | null;
+    }
+
+    export interface Modifier {
+        name: string;
+        value: ModifierValue;
+        type: ModifierType;
+    }
+}
+
+export namespace InternalApi {
+    export interface Item {
+        officialApiItem: OfficialApi.Item;
+        modifiers: Modifiers.Modifier[];
     }
 }

@@ -6,8 +6,7 @@ demon.officialApiUpdate();
 */
 
 // default
-/*
-import { CurrencyUpdater } from './Updaters/CurrencyUpdater';
+/*import { CurrencyUpdater } from './Updaters/CurrencyUpdater';
 import { Server } from './types';
 import * as compression from 'compression';
 import { CurrencyRouter } from './routers/CurrencyRouter';
@@ -35,8 +34,7 @@ app.post('/addFilter', (req: Server.AddFilterRequest, res: Server.ServerResponse
     res.end('not finished');
 });
 
-app.listen(3001);
-*/
+app.listen(3001);*/
 
 // fetcher
 import { OfficialApiResponseValidator as Validator } from './validators/OfficialApiResponseValidator';
@@ -46,7 +44,9 @@ import { StashApiRequest } from './requests/StashApiRequest';
 import { OfficialApi, RequestInterface } from './types';
 // import Item = OfficialApi.Item;
 import GeneralResponse = OfficialApi.GeneralResponse;
-import { ModifiersDatabase } from './databasesApi/ModifiersDatabase';
+import { OfficialApiParser } from './parsers/OfficialApiParser';
+import { itemBeautify } from './parsers/itemBeautify';
+import { ItemParser } from './parsers/ItemParser';
 
 async function getResponse(id: string): Promise<GeneralResponse> {
     const stashRequest = new StashApiRequest(id);
@@ -68,67 +68,21 @@ function checkResponse(apiResp: object): apiResp is GeneralResponse {
     return Validator.validate(apiResp);
 }
 
-let modsCount: number[] = Array(20).fill(0);
-
 async function fetchResponsesContinuously (
     id: string
 ): Promise<GeneralResponse> {
     let res = await getResponse(id);
-    res.stashes.forEach((stash) => {
-        if (stash.accountName === 'tup1tsa') {
-            console.log('found mine account');
-        }
-        stash.items.forEach((item) => {
-            let totalMods = 0;
-            // if (item.implicitMods) {
-            //     totalMods += item.implicitMods.length;
-            // }
-            // if (item.explicitMods) {
-            //     totalMods += item.explicitMods.length;
-            // }
-            // if (item.craftedMods) {
-            //     totalMods += item.craftedMods.length;
-            // }
-            if (item.utilityMods) {
-                totalMods += item.utilityMods.length;
-            }
-            // if (item.enchantMods) {
-            //     totalMods += item.enchantMods.length;
-            // }
-            // const regExp = new RegExp('Mana Gained', 'i');
-            // const additionalMod = item.implicitMods && item.implicitMods[1] ? item.implicitMods[1] : undefined;
-            modsCount[totalMods] ++;
-            // if (
-            //     totalMods === 2
-            //     && additionalMod
-            //     && additionalMod.match(regExp) === null
-            //     && item.category !== 'leaguestones'
-            // ) {
-            //     console.log(item);
-            // }
-        });
-    });
-    const itemsProccessed = modsCount.reduce((total, current) => total + current, 0);
-    const message = modsCount.map((modNumber, index) => {
-        return `Items percentage with ${index} mods is ${modNumber / itemsProccessed * 100}%`;
-    }).join('\n');
-    console.log(message);
-    /*let db = new ModifiersDatabase();
-    db.tempUpdate(res.stashes, res.next_change_id);*/
+    const parser = new OfficialApiParser(res);
+    const items = parser.getAllItems();
+    const beautifiedItems = itemBeautify(items);
+    const uniqueParser = new ItemParser(beautifiedItems);
+    const uniqueData = uniqueParser.getAllUniqueData();
+    // save here in db
     return fetchResponsesContinuously(res.next_change_id);
 }
 
-fetchResponsesContinuously('128024191-133994962-125703711-144823900-135439502');
-
-// console.time('download');
-/*let idRequest = new LatestIdRequest();
-idRequest.getLatestApiId()
-    .then(id => {
-        fetchResponsesContinuously(id);
-    });*/
-/// some data
-// const firstId = '126553920-132466241-124259500-143210747-133883517';
-// fetchResponsesContinuously(firstId, 0);
+const firstId = '126553920-132466241-124259500-143210747-133883517';
+fetchResponsesContinuously(firstId);
 //
 // current id  =  '122812208-128445806-120878249-138348759-129697704'
 // current items = '2640514'
@@ -196,54 +150,3 @@ idRequest.getLatestApiId()
 // there is around 700k stashes with more than 1 item inside
 // stashed for standard and abyss have different ids
 // other items are active (changing all the time)
-
-// indices sizes test
-/*import { IndicesSizeTestDatabase } from './databasesApi/IndicesSizeTestDatabase';
-
-interface Modifier {
-    type: number;
-    value: number;
-}
-
-interface Item {
-    name: string;
-    mods: Modifier[];
-}
-
-function getRandomMods(): Modifier[] {
-    let mods: Modifier[] = [];
-    const modsCount = Math.floor(Math.random() * 12);
-    for (let i = 0; i < modsCount; i++) {
-        mods.push({
-            type: Math.floor(Math.random() * 1000),
-            value: Math.floor(Math.random() * 100) + 20
-        });
-    }
-    return mods;
-}
-
-function getRandomName(): string {
-    const chars = 'qwertyuiopasdfghjklzxcvbnm';
-    return Array(3).fill('').map(() => {
-        const index = Math.floor(Math.random() * 24);
-        return chars[index];
-    }).join('');
-}
-
-let items: Item[] = [];
-
-for (let i = 0; i < 1000000; i++) {
-    items.push({
-        name: getRandomName(),
-        mods: getRandomMods()
-    });
-}
-
-let db = new IndicesSizeTestDatabase();
-async function log() {
-    console.time('start');
-    await db.update(items);
-    console.timeEnd('start');
-}
-
-log();*/

@@ -25,7 +25,7 @@ export class CurrencyDatabase extends Database {
         if (!this.validateList(list)) {
             throw new Error('Currency list for saving is invalid');
         }
-        await this.write([list]);
+        await this.insert([list]);
         const result = this.getResult();
         if (result.error) {
             throw new Error('There were some problems while saving currency list to db');

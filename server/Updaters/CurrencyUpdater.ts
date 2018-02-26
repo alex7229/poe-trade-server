@@ -1,5 +1,5 @@
 import { CurrencyRequest } from '../requests/PoeNinja/CurrencyRequest';
-import { DatabaseCurrency } from '../databasesApi/CurrencyDatabase';
+import { CurrencyDatabase } from '../databasesApi/CurrencyDatabase';
 import * as moment from 'moment';
 import { Currency } from '../types';
 
@@ -12,7 +12,7 @@ export class CurrencyUpdater {
     }
 
     private static async update(): Promise<boolean> {
-        const dbInstance = new DatabaseCurrency();
+        const dbInstance = new CurrencyDatabase();
         let list;
         try {
             list = await dbInstance.fetchLatestListFromDb();
@@ -29,7 +29,7 @@ export class CurrencyUpdater {
         try {
             const request = new CurrencyRequest();
             const listFromApi: Currency.ChaosEquivalent[] = await request.fetchList();
-            const db = new DatabaseCurrency();
+            const db = new CurrencyDatabase();
             await db.saveListToDb({
                 exchangeRates: listFromApi,
                 updateTime: moment.now()
