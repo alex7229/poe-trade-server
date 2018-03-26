@@ -12,13 +12,6 @@ export class OfficialApiResponseValidator {
         const numberType = {type: 'number'};
         const nullType = {type: 'null'};
 
-        const stringArrayType = {
-            type: 'array',
-            items: {
-                type: 'string'
-            }
-        };
-
         const itemPropertiesSchema = {
             type: 'array',
             items: {
@@ -79,30 +72,6 @@ export class OfficialApiResponseValidator {
                     additionalProperties: false
                 }
             ]
-        };
-
-        const socketsSchema = {
-            type: 'array',
-            items: {
-                type: 'object',
-                properties: {
-                    group: numberType,
-                    sColour: {
-                        type: 'string',
-                        pattern: '^[GWRBA]$'
-                    },
-                    attr: {
-                        oneof: [
-                            booleanType,
-                            {
-                                type: 'string',
-                                pattern: '^[SDIG]$'
-                            }
-                        ]
-                    }
-                },
-                additionalProperties: false
-            }
         };
 
         const itemSchema = {

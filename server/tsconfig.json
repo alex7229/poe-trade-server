@@ -16,7 +16,8 @@
     "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": true,
     "types": [
-      "node"
+      "node",
+      "jest"
     ]
   }
 }
