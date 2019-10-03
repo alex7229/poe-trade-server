@@ -1,5 +1,5 @@
-import { Database } from './Database';
-import { Modifiers, OfficialApi } from '../types';
+import { Database } from "./Database";
+import { Modifiers, OfficialApi } from "../types";
 
 import Modifier = Modifiers.Modifier;
 import ModifiersSearchOptions = Modifiers.ModifiersSearchOptions;
@@ -27,17 +27,16 @@ import Stash = OfficialApi.Stash;
 // ... by theit unique internal  _id, which should be stored in unique item object)
 
 export class ModifiersDatabase extends Database {
-
   constructor() {
-    super('modifiers');
+    super("modifiers");
   }
 
   public async writeModifiers(modifiers: Modifier[]) {
-    await this.write(modifiers, {ordered: false});
+    await this.write(modifiers, { ordered: false });
     const result = this.getResult();
     if (result.error) {
       // check the error (it can either be duplicate insert  or some other error)
-      throw new Error('There were some problems saving modifiers');
+      throw new Error("There were some problems saving modifiers");
     }
   }
 
@@ -46,48 +45,51 @@ export class ModifiersDatabase extends Database {
       let abyss = 0;
       let other = 0;
       stash.items.forEach(item => {
-        if (item.league === 'Abyss') {
+        if (item.league === "Abyss") {
           abyss++;
         } else {
           other++;
         }
       });
       try {
-        await this.upsert({
-          '_id': stash.id
-        }, {
-          '_id': stash.id,
-          abyss,
-          other
-        });
+        await this.upsert(
+          {
+            _id: stash.id
+          },
+          {
+            _id: stash.id,
+            abyss,
+            other
+          }
+        );
       } catch (err) {
         debugger;
       }
     }
     return await this.upsert(
-      {'latest_id': {'$exists': true}},
-      {'latest_id': changeId}
+      { latest_id: { $exists: true } },
+      { latest_id: changeId }
     );
   }
 
   public async fetchAllModifiers(): Promise<object[]> {
-    return await this.fetchModifiers({}, {name: 1});
+    return await this.fetchModifiers({}, { name: 1 });
   }
 
-  public async fetchModifiers (
+  public async fetchModifiers(
     modifiersData: ModifiersSearchOptions = {},
-    sortObject: object = {name: 1},
+    sortObject: object = { name: 1 },
     limit: number = 0
   ): Promise<object[]> {
     const query = Object.create(null);
     if (modifiersData.names) {
-      query.name = {$in: modifiersData.names};
+      query.name = { $in: modifiersData.names };
     }
     if (modifiersData.types) {
-      query.type = {$in: modifiersData.types};
+      query.type = { $in: modifiersData.types };
     }
     if (modifiersData.used_in) {
-      query.used_in = {$in: modifiersData.used_in};
+      query.used_in = { $in: modifiersData.used_in };
     }
     await this.read(query, sortObject, limit);
     const result = this.getResult();
@@ -96,5 +98,4 @@ export class ModifiersDatabase extends Database {
     }
     return result.data;
   }
-
 }

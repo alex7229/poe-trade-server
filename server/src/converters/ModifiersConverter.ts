@@ -1,11 +1,10 @@
-import { OfficialApi , Modifiers } from '../types';
+import { OfficialApi, Modifiers } from "../types";
 
 import Item = OfficialApi.Item;
 import ModifierType = Modifiers.ModifierType;
 import Modifier = Modifiers.Modifier;
 
 export class ModifiersConverter {
-
   private item: Item;
 
   private modifiers: Modifiers.Modifier[] = [];
@@ -22,37 +21,69 @@ export class ModifiersConverter {
   private convertModifiers(): void {
     let mods: Modifier[] = [];
     if (this.item.explicitMods) {
-      mods = this.parseMultipleModifiers(this.item.explicitMods, ModifierType.explicitMods);
+      mods = this.parseMultipleModifiers(
+        this.item.explicitMods,
+        ModifierType.explicitMods
+      );
     }
     if (this.item.implicitMods) {
-      mods = mods.concat(this.parseMultipleModifiers(this.item.implicitMods, ModifierType.implicitMods));
+      mods = mods.concat(
+        this.parseMultipleModifiers(
+          this.item.implicitMods,
+          ModifierType.implicitMods
+        )
+      );
     }
     if (this.item.craftedMods) {
-      mods = mods.concat(this.parseMultipleModifiers(this.item.craftedMods, ModifierType.craftedMods));
+      mods = mods.concat(
+        this.parseMultipleModifiers(
+          this.item.craftedMods,
+          ModifierType.craftedMods
+        )
+      );
     }
     if (this.item.utilityMods) {
-      mods = mods.concat(this.parseMultipleModifiers(this.item.utilityMods, ModifierType.utilityMods));
+      mods = mods.concat(
+        this.parseMultipleModifiers(
+          this.item.utilityMods,
+          ModifierType.utilityMods
+        )
+      );
     }
     if (this.item.enchantMods) {
-      mods = mods.concat(this.parseMultipleModifiers(this.item.enchantMods, ModifierType.enchantMods));
+      mods = mods.concat(
+        this.parseMultipleModifiers(
+          this.item.enchantMods,
+          ModifierType.enchantMods
+        )
+      );
     }
     if (this.item.cosmeticMods) {
-      mods = mods.concat(this.parseMultipleModifiers(this.item.cosmeticMods, ModifierType.cosmeticMods));
+      mods = mods.concat(
+        this.parseMultipleModifiers(
+          this.item.cosmeticMods,
+          ModifierType.cosmeticMods
+        )
+      );
     }
     this.modifiers = mods;
   }
 
-  private parseMultipleModifiers(modifierTexts: string[], modifierType: number): Modifier[] {
-    return modifierTexts.map(modifierText => this.parseModifier(modifierText, modifierType));
+  private parseMultipleModifiers(
+    modifierTexts: string[],
+    modifierType: number
+  ): Modifier[] {
+    return modifierTexts.map(modifierText =>
+      this.parseModifier(modifierText, modifierType)
+    );
   }
 
   private parseModifier(modifierText: string, modifierType: number): Modifier {
     const regExp = /(?:\d*\.)?\d+/g;
     return {
       type: modifierType,
-      name: modifierText.replace(regExp, '#'),
+      name: modifierText.replace(regExp, "#"),
       value: this.getValuesFromModifierText(modifierText)
-
     };
   }
 
@@ -78,5 +109,4 @@ export class ModifiersConverter {
     }
     return value;
   }
-
 }

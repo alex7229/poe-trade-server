@@ -1,5 +1,7 @@
-import { OfficialApi } from '../types';
+import { OfficialApi } from "../types";
 
-export const validateOfficialApiItem = (item: object): item is OfficialApi.Item => {
+export const validateOfficialApiItem = (
+  item: object
+): item is OfficialApi.Item => {
   return true;
 };

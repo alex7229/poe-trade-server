@@ -1,10 +1,9 @@
-import * as moment from 'moment';
-import { CurrencyRequest } from '../requests/PoeNinja/CurrencyRequest';
-import { CurrencyDatabase } from '../databasesApi/CurrencyDatabase';
-import { Currency } from '../types';
+import * as moment from "moment";
+import { CurrencyRequest } from "../requests/PoeNinja/CurrencyRequest";
+import { CurrencyDatabase } from "../databasesApi/CurrencyDatabase";
+import { Currency } from "../types";
 
 export class CurrencyUpdater {
-
   public static run(): void {
     this.update();
     const sixHours = 6 * 60 * 60 * 1000;
@@ -25,7 +24,7 @@ export class CurrencyUpdater {
     return await this.fetchAndSaveList();
   }
 
-  private static async fetchAndSaveList (): Promise<boolean> {
+  private static async fetchAndSaveList(): Promise<boolean> {
     try {
       const request = new CurrencyRequest();
       const listFromApi: Currency.ChaosEquivalent[] = await request.fetchList();
@@ -42,6 +41,6 @@ export class CurrencyUpdater {
 
   private static isListOutdated(list: Currency.DatabaseList): boolean {
     const now = moment();
-    return now.diff(list.updateTime, 'hours') >= 3;
+    return now.diff(list.updateTime, "hours") >= 3;
   }
 }

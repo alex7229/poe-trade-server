@@ -1,25 +1,24 @@
-import * as moment from 'moment';
-import { Moment } from 'moment';
+import * as moment from "moment";
+import { Moment } from "moment";
 
 import Base = moment.unitOfTime.Base;
 
 class Time {
-
   private rawTime: string;
 
   private possibleUnits: string[] = [
-    'seconds',
-    'minutes',
-    'hours',
-    'days',
-    'weeks',
-    'months',
-    'years'
+    "seconds",
+    "minutes",
+    "hours",
+    "days",
+    "weeks",
+    "months",
+    "years"
   ];
 
   private parsedTime: Moment;
 
-  constructor (rawTime: string) {
+  constructor(rawTime: string) {
     this.rawTime = rawTime;
     this.parseTime();
   }
@@ -29,10 +28,10 @@ class Time {
   }
 
   public getStringTime(): string {
-    return this.parsedTime.format('DD.MM.YY HH:mm');
+    return this.parsedTime.format("DD.MM.YY HH:mm");
   }
 
-  private parseTime () {
+  private parseTime() {
     /* rawTime variants
         1) 0...n seconds ago
         4) a minute ago
@@ -48,28 +47,28 @@ class Time {
     const regExp: RegExp = /(a|an|[\d]*) ([\w]*) ago/;
     const match = this.rawTime.match(regExp);
     let duration: number = 1;
-    let units: string = 'days';
+    let units: string = "days";
     if (match !== null && match[1] && match[2]) {
-      if (match[1] === 'a' || match[1] === 'an') {
+      if (match[1] === "a" || match[1] === "an") {
         duration = 1;
       } else {
         duration = parseInt(match[1], 10);
       }
       units = match[2];
-      if (units[units.length - 1] !== 's') {
-        units += 's';
+      if (units[units.length - 1] !== "s") {
+        units += "s";
       }
-    } else if (this.rawTime !== 'Yesterday') {
+    } else if (this.rawTime !== "Yesterday") {
       this.logError();
     }
     if (!this.isUnitTypeCorrect(units)) {
       this.logError();
-    } else  {
-      this.parsedTime =  moment().subtract(duration, units);
+    } else {
+      this.parsedTime = moment().subtract(duration, units);
     }
   }
 
-  private isUnitTypeCorrect (unit: string): unit is Base {
+  private isUnitTypeCorrect(unit: string): unit is Base {
     return this.possibleUnits.includes(unit);
   }
 
@@ -78,4 +77,4 @@ class Time {
   }
 }
 
-export {Time};
+export { Time };

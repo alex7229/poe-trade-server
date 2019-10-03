@@ -1,8 +1,7 @@
-import { Request } from './Request';
-import { RequestInterface } from '../types';
+import { Request } from "./Request";
+import { RequestInterface } from "../types";
 
 export class StashApiRequest extends Request {
-
   private id: string;
 
   private url: string;
@@ -15,11 +14,11 @@ export class StashApiRequest extends Request {
     this.generateUrl();
   }
 
-  public async fetchStashes (): Promise<RequestInterface.Response> {
-    return this.fetchData(this.url, {timeout: this.responseTimeout});
+  public async fetchStashes(): Promise<RequestInterface.Response> {
+    return this.fetchData(this.url, { timeout: this.responseTimeout });
   }
 
-  private generateUrl (): void {
+  private generateUrl(): void {
     this.url = `http://www.pathofexile.com/api/public-stash-tabs?id=${this.id}`;
   }
 }

@@ -1,13 +1,12 @@
-import * as _ from 'lodash';
-import { InternalApi } from '../types';
+import * as _ from "lodash";
+import { InternalApi } from "../types";
 
 import Item = InternalApi.Item;
 
 export class ItemParser {
-
   private items: Item[];
 
-  constructor (items: Item[]) {
+  constructor(items: Item[]) {
     this.items = items;
   }
 
@@ -22,15 +21,15 @@ export class ItemParser {
   }
 
   /**
-     *
-     * @returns {string[][]} array of unique modifiers names with modifier type as index of sub array
-     */
+   *
+   * @returns {string[][]} array of unique modifiers names with modifier type as index of sub array
+   */
   private getAllUniqueModifiers(): string[][] {
     const allModifiers = _.chain(this.items)
       .map(item => item.modifiers)
       .reduce((currentMods, totalMods) => {
         return totalMods.concat(currentMods);
-      },      [])
+      }, [])
       .value();
     const modifiersByType: string[][] = [];
     allModifiers.forEach(modifier => {
@@ -74,5 +73,4 @@ export class ItemParser {
       .uniq()
       .value();
   }
-
 }

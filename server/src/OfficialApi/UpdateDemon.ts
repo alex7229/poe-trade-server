@@ -1,7 +1,7 @@
-import { ApiValidator } from './ApiValidator';
-import { StashApiRequest } from '../requests/StashApiRequest';
-import { RequestInterface } from '../types';
-import { LatestIdRequest } from '../requests/PoeNinja/LatestIdRequest';
+import { ApiValidator } from "./ApiValidator";
+import { StashApiRequest } from "../requests/StashApiRequest";
+import { RequestInterface } from "../types";
+import { LatestIdRequest } from "../requests/PoeNinja/LatestIdRequest";
 
 /* interface ApiDescription {
     time: string;
@@ -10,14 +10,13 @@ import { LatestIdRequest } from '../requests/PoeNinja/LatestIdRequest';
 } */
 
 export class UpdateDemon {
-
   private currentId: string;
 
   private readonly officialApiDelay: number = 50;
 
   private readonly thirdPartyApiDelay: number = 3000;
 
-  async officialApiUpdate (): Promise<void> {
+  async officialApiUpdate(): Promise<void> {
     if (!this.currentId) {
       const latestIdRequest = new LatestIdRequest();
       try {
@@ -35,7 +34,11 @@ export class UpdateDemon {
       this.retryUpdate(this.officialApiDelay);
       return;
     }
-    if (response.body && typeof response.body === 'string' && ApiValidator.validate(response.body)) {
+    if (
+      response.body &&
+      typeof response.body === "string" &&
+      ApiValidator.validate(response.body)
+    ) {
       const parsedData = JSON.parse(response.body);
       this.currentId = parsedData.next_change_id;
       // update demon shouldn't validate fully data - juust check if it has id
@@ -43,7 +46,6 @@ export class UpdateDemon {
       // it's ok
     } else {
       // not ok
-
     }
 
     this.retryUpdate(this.officialApiDelay);
@@ -67,7 +69,6 @@ export class UpdateDemon {
             this.currentId = apiResponse.data['next_change_id'];
         }
         this.retryUpdate(this.officialApiDelay); */
-        
   }
 
   /* async saveDescription (apiResponse) {
@@ -84,7 +85,7 @@ export class UpdateDemon {
         });
     } */
 
-  retryUpdate (timeout: number): void {
+  retryUpdate(timeout: number): void {
     setTimeout(() => this.officialApiUpdate(), timeout);
   }
 
@@ -94,5 +95,4 @@ export class UpdateDemon {
             console.log(match);
         } */
   }
-
 }
